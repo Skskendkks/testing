@@ -1,11 +1,11 @@
 {
-  "ts": "2026-08-23T21:30:36+00:00",
-  "temp_mean": 28.2,
-  "hum_mean": 88.0,
-  "rain_total": 10,
-  "rain_main": 6,
-  "rain_1h": -12.0,
-  "rain_3h": 10.0,
+  "ts": "2026-08-23T22:32:42+00:00",
+  "temp_mean": 28.3,
+  "hum_mean": 87.0,
+  "rain_total": 1,
+  "rain_main": 1,
+  "rain_1h": 0.0,
+  "rain_3h": -21.0,
   "active_warnings": [],
   "special_tips": [],
   "predictions": {
@@ -14,7 +14,7 @@
     "red_3h": 0.02,
     "tc3_6h": 0.24
   },
-  "v3_grid_ts": "202608240542",
+  "v3_grid_ts": "202608240642",
   "official_levels": {},
   "tc": null,
   "tc_scanned": [],
