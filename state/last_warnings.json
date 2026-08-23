@@ -10,10 +10,10 @@
     "WTS": {
       "name": "Thunderstorm Warning",
       "code": "WTS",
-      "actionCode": "ISSUE",
+      "actionCode": "UPDATE",
       "issueTime": "2026-08-23T14:00:00+08:00",
       "expireTime": "2026-08-23T16:00:00+08:00",
-      "updateTime": "2026-08-23T14:00:00+08:00"
+      "updateTime": "2026-08-23T15:21:00+08:00"
     }
   },
   "levels": {}
