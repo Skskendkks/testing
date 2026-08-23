@@ -1,4 +1,12 @@
 {
-  "warnsum": {},
+  "warnsum": {
+    "WHOT": {
+      "name": "Very Hot Weather Warning",
+      "code": "WHOT",
+      "actionCode": "ISSUE",
+      "issueTime": "2026-08-23T13:10:00+08:00",
+      "updateTime": "2026-08-23T13:10:00+08:00"
+    }
+  },
   "levels": {}
 }
