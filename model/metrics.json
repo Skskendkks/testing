@@ -1,26 +1,26 @@
 {
-  "n_total": 240776,
-  "generated": "2026-08-22T04:00:35",
+  "n_total": 240798,
+  "generated": "2026-08-23T04:05:30",
   "targets": {
     "rain_1h": {
-      "n_samples": 239475,
-      "n_pos": 28,
-      "n_val": 47895,
-      "n_val_pos": 28,
+      "n_samples": 239488,
+      "n_pos": 31,
+      "n_val": 47898,
+      "n_val_pos": 31,
       "status": "skipped (a fold has a single class \u2014 need more positives)"
     },
     "amber_3h": {
-      "n_samples": 240678,
+      "n_samples": 240701,
       "n_pos": 3152,
-      "n_val": 48136,
+      "n_val": 48141,
       "n_val_pos": 836,
       "lr": {
         "pr_auc": 0.2524,
-        "brier": 0.0929
+        "brier": 0.0931
       },
       "trees": {
-        "pr_auc": 0.249,
-        "brier": 0.0683
+        "pr_auc": 0.2455,
+        "brier": 0.0686
       },
       "model": "lr",
       "calibrated": true,
@@ -39,17 +39,17 @@
       "status": "shipped"
     },
     "red_3h": {
-      "n_samples": 240678,
+      "n_samples": 240701,
       "n_pos": 592,
-      "n_val": 48136,
+      "n_val": 48141,
       "n_val_pos": 172,
       "lr": {
         "pr_auc": 0.1368,
-        "brier": 0.0851
+        "brier": 0.0852
       },
       "trees": {
-        "pr_auc": 0.0896,
-        "brier": 0.0193
+        "pr_auc": 0.0944,
+        "brier": 0.0203
       },
       "model": "lr",
       "calibrated": true,
@@ -66,21 +66,21 @@
       "status": "rules-only (did not beat persistence baseline)"
     },
     "tc3_6h": {
-      "n_samples": 240740,
+      "n_samples": 240762,
       "n_pos": 2806,
-      "n_val": 48148,
+      "n_val": 48153,
       "n_val_pos": 788,
       "lr": {
-        "pr_auc": 0.0536,
-        "brier": 0.2208
+        "pr_auc": 0.0535,
+        "brier": 0.221
       },
       "trees": {
-        "pr_auc": 0.0589,
-        "brier": 0.1266
+        "pr_auc": 0.0565,
+        "brier": 0.1251
       },
       "model": "trees",
       "calibrated": true,
-      "pr_auc": 0.0589,
+      "pr_auc": 0.0565,
       "brier": 0.0158,
       "persistence": {
         "pr_auc": 0.6863,
@@ -95,6 +95,6 @@
   },
   "train_range": [
     "1998-01-01T00:00:00+00:00",
-    "2026-08-22T03:50:47+00:00"
+    "2026-08-23T03:11:58+00:00"
   ]
 }
