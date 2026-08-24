@@ -1,24 +1,22 @@
 {
-  "ts": "2026-08-24T21:38:10+00:00",
-  "temp_mean": 28.0,
-  "hum_mean": 80.0,
-  "rain_total": 42,
-  "rain_main": 11,
-  "rain_1h": -121.0,
-  "rain_3h": 32.0,
+  "ts": "2026-08-24T22:37:35+00:00",
+  "temp_mean": 28.2,
+  "hum_mean": 81.0,
+  "rain_total": 26,
+  "rain_main": 10,
+  "rain_1h": -16.0,
+  "rain_3h": -12.0,
   "active_warnings": [
     "Thunderstorm Warning (EXTEND)"
   ],
-  "special_tips": [
-    "Areas of showers continue to develop in the vicinity of the Pearl River Estuary. Showers are expected to be heavier over parts of the territory in the next couple of hours. Members of the public should be aware of the change in weather."
-  ],
+  "special_tips": [],
   "predictions": {
     "rain_1h": 0.25,
-    "amber_3h": 0.341,
+    "amber_3h": 0.194,
     "red_3h": 0.02,
     "tc3_6h": 0.24
   },
-  "v3_grid_ts": "202608250554",
+  "v3_grid_ts": "202608250654",
   "official_levels": {},
   "tc": null,
   "tc_scanned": [],
