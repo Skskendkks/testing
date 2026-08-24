@@ -1,25 +1,24 @@
 {
-  "ts": "2026-08-24T04:56:00+00:00",
-  "temp_mean": 32.6,
-  "hum_mean": 70.0,
-  "rain_total": 3,
-  "rain_main": 3,
-  "rain_1h": 0.0,
-  "rain_3h": 0.0,
+  "ts": "2026-08-24T05:48:21+00:00",
+  "temp_mean": 32.4,
+  "hum_mean": 69.0,
+  "rain_total": 11,
+  "rain_main": 8,
+  "rain_1h": 8.0,
+  "rain_3h": 8.0,
   "active_warnings": [
-    "Very Hot Weather Warning (ISSUE)",
-    "Thunderstorm Warning (ISSUE)"
+    "Very Hot Weather Warning (ISSUE)"
   ],
   "special_tips": [
     "Tropical Cyclone Narra is expected to skirt the vicinity of the western coast of Leizhou Peninsula in the next couple of days, maintaining quite some distance from Hong Kong. Unless Narra further edges closer to the vicinity of the Pearl River Estuary, the chance of issuing tropical cyclone warning signal is relatively low. Under the influence of an active southerly airstream, there will be showers and squally thunderstorms over Hong Kong midweek this week, and winds will be occasionally strong offshore and on high ground. Members of the public should be on the alert.\n\nBesides, Tropical Cyclone Gaenari near Taiwan has a relatively weak intensity with small circulation. Its direct threat to Hong Kong is not high. Gaenari is expected to dissipate gradually in the vicinity of Taiwan Strait today."
   ],
   "predictions": {
-    "rain_1h": 0.25,
-    "amber_3h": 0.167,
+    "rain_1h": 0.6,
+    "amber_3h": 0.017,
     "red_3h": 0.02,
     "tc3_6h": 0.24
   },
-  "v3_grid_ts": "202608241306",
+  "v3_grid_ts": "202608241406",
   "official_levels": {},
   "tc": null,
   "tc_scanned": [],
