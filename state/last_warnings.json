@@ -1,13 +1,4 @@
 {
-  "warnsum": {
-    "WTS": {
-      "name": "Thunderstorm Warning",
-      "code": "WTS",
-      "actionCode": "EXTEND",
-      "issueTime": "2026-08-25T02:33:00+08:00",
-      "expireTime": "2026-08-25T08:30:00+08:00",
-      "updateTime": "2026-08-25T06:55:00+08:00"
-    }
-  },
+  "warnsum": {},
   "levels": {}
 }
