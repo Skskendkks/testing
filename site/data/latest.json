@@ -1,22 +1,24 @@
 {
-  "ts": "2026-08-25T07:02:49+00:00",
+  "ts": "2026-08-25T07:53:22+00:00",
   "temp_mean": 30.0,
-  "hum_mean": 75.0,
+  "hum_mean": 77.0,
   "rain_total": 0,
   "rain_main": 0,
   "rain_1h": 0.0,
-  "rain_3h": -97.0,
-  "active_warnings": [],
+  "rain_3h": -85.0,
+  "active_warnings": [
+    "Thunderstorm Warning (ISSUE)"
+  ],
   "special_tips": [
     "Hot weather might cause adverse health effects. The public should stay on the alert and drink more water."
   ],
   "predictions": {
-    "rain_1h": 0.1,
-    "amber_3h": 0.018,
+    "rain_1h": 0.25,
+    "amber_3h": 0.187,
     "red_3h": 0.02,
     "tc3_6h": 0.24
   },
-  "v3_grid_ts": "202608251518",
+  "v3_grid_ts": "202608251606",
   "official_levels": {},
   "tc": null,
   "tc_scanned": [],
