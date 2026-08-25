@@ -1,22 +1,25 @@
 {
-  "ts": "2026-08-25T01:46:42+00:00",
-  "temp_mean": 29.5,
-  "hum_mean": 77.0,
-  "rain_total": 9,
-  "rain_main": 3,
+  "ts": "2026-08-25T03:08:25+00:00",
+  "temp_mean": 30.3,
+  "hum_mean": 72.0,
+  "rain_total": 7,
+  "rain_main": 4,
   "rain_1h": 0.0,
-  "rain_3h": -45.0,
-  "active_warnings": [],
+  "rain_3h": -2.0,
+  "active_warnings": [
+    "Thunderstorm Warning (ISSUE)"
+  ],
   "special_tips": [
+    "An area of thundery showers is affecting the territory. Showers are expected to be heavier with isolated squally thunderstorms at first. Members of the public should be on the alert.",
     "Hot weather might cause adverse health effects. The public should stay on the alert and drink more water."
   ],
   "predictions": {
-    "rain_1h": 0.1,
-    "amber_3h": 0.018,
+    "rain_1h": 0.25,
+    "amber_3h": 0.174,
     "red_3h": 0.02,
     "tc3_6h": 0.24
   },
-  "v3_grid_ts": "202608250954",
+  "v3_grid_ts": "202608251118",
   "official_levels": {},
   "tc": null,
   "tc_scanned": [],
