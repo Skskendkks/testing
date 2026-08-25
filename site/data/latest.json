@@ -1,25 +1,24 @@
 {
-  "ts": "2026-08-25T04:48:46+00:00",
-  "temp_mean": 28.2,
-  "hum_mean": 83.0,
-  "rain_total": 97,
-  "rain_main": 20,
-  "rain_1h": 0.0,
-  "rain_3h": 90.0,
+  "ts": "2026-08-25T05:40:30+00:00",
+  "temp_mean": 28.6,
+  "hum_mean": 78.0,
+  "rain_total": 85,
+  "rain_main": 18,
+  "rain_1h": -12.0,
+  "rain_3h": 78.0,
   "active_warnings": [
-    "Thunderstorm Warning (UPDATE)"
+    "Thunderstorm Warning (CANCEL)"
   ],
   "special_tips": [
-    "Intense gusts reaching 80 kilometres per hour or above may affect Hong Kong. Members of public should seek safe shelter as soon as possible.",
     "Hot weather might cause adverse health effects. The public should stay on the alert and drink more water."
   ],
   "predictions": {
     "rain_1h": 0.25,
-    "amber_3h": 0.348,
+    "amber_3h": 0.337,
     "red_3h": 0.47,
     "tc3_6h": 0.24
   },
-  "v3_grid_ts": "202608251306",
+  "v3_grid_ts": "202608251354",
   "official_levels": {},
   "tc": null,
   "tc_scanned": [],
