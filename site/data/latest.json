@@ -1,20 +1,25 @@
 {
-  "ts": "2026-08-25T20:39:21+00:00",
-  "temp_mean": 28.2,
+  "ts": "2026-08-25T21:37:44+00:00",
+  "temp_mean": 28.3,
   "hum_mean": 84.0,
   "rain_total": 0,
   "rain_main": 0,
   "rain_1h": 0.0,
-  "rain_3h": -1.0,
-  "active_warnings": [],
-  "special_tips": [],
+  "rain_3h": 0.0,
+  "active_warnings": [
+    "Thunderstorm Warning (ISSUE)"
+  ],
+  "special_tips": [
+    "Intense gusts reaching 70 kilometres per hour or above may affect Hong Kong. Members of public should seek safe shelter as soon as possible.",
+    "A band of thundery showers is edging closer gradually. Showers are expected to be heavier in some areas with squally thunderstorms in the next couple of hours. Members of the public please be aware of the change in weather before going out in the morning."
+  ],
   "predictions": {
-    "rain_1h": 0.1,
-    "amber_3h": 0.02,
+    "rain_1h": 0.25,
+    "amber_3h": 0.199,
     "red_3h": 0.02,
     "tc3_6h": 0.24
   },
-  "v3_grid_ts": "202608260454",
+  "v3_grid_ts": "202608260554",
   "official_levels": {},
   "tc": null,
   "tc_scanned": [],
