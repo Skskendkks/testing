@@ -1,13 +1,5 @@
 {
   "warnsum": {
-    "WRAIN": {
-      "name": "Rainstorm Warning Signal",
-      "code": "WRAINA",
-      "type": "Amber",
-      "actionCode": "CANCEL",
-      "issueTime": "2026-08-26T18:45:00+08:00",
-      "updateTime": "2026-08-26T20:40:00+08:00"
-    },
     "WTS": {
       "name": "Thunderstorm Warning",
       "code": "WTS",
