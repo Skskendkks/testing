@@ -17,5 +17,9 @@
       "updateTime": "2026-08-26T18:45:00+08:00"
     }
   },
-  "levels": {}
+  "levels": {
+    "w_RAIN_AMBER": true,
+    "w_RAIN_RED": false,
+    "w_RAIN_BLACK": false
+  }
 }
