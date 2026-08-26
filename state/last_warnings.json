@@ -1,13 +1,25 @@
 {
   "warnsum": {
+    "WRAIN": {
+      "name": "Rainstorm Warning Signal",
+      "code": "WRAINA",
+      "type": "Amber",
+      "actionCode": "ISSUE",
+      "issueTime": "2026-08-27T00:00:00+08:00",
+      "updateTime": "2026-08-27T00:00:00+08:00"
+    },
     "WTS": {
       "name": "Thunderstorm Warning",
       "code": "WTS",
       "actionCode": "EXTEND",
       "issueTime": "2026-08-26T05:20:00+08:00",
-      "expireTime": "2026-08-26T23:30:00+08:00",
-      "updateTime": "2026-08-26T20:45:00+08:00"
+      "expireTime": "2026-08-27T03:00:00+08:00",
+      "updateTime": "2026-08-26T23:00:00+08:00"
     }
   },
-  "levels": {}
+  "levels": {
+    "w_RAIN_AMBER": true,
+    "w_RAIN_RED": false,
+    "w_RAIN_BLACK": false
+  }
 }
