@@ -1,24 +1,25 @@
 {
-  "ts": "2026-08-26T09:52:34+00:00",
+  "ts": "2026-08-26T10:46:35+00:00",
   "temp_mean": 28.5,
-  "hum_mean": 86.0,
+  "hum_mean": 81.0,
   "rain_total": 0,
   "rain_main": 0,
   "rain_1h": 0.0,
   "rain_3h": -64.0,
   "active_warnings": [
+    "Rainstorm Warning Signal (ISSUE)",
     "Thunderstorm Warning (EXTEND)"
   ],
   "special_tips": [
-    "Under the influence of an active southerly airstream, showers will be heavy at times with squally thunderstorms over Hong Kong tonight and tomorrow morning. The Observatory will issue rainstorm warning signals or Localised Heavy Rain Advisory when necessary. Members of the public should pay attention to the latest weather information issued by the Observatory before going to work or school tomorrow morning."
+    "Widespread heavy rain may affect Hong Kong in a couple of hours. Members of the public should be on the alert."
   ],
   "predictions": {
     "rain_1h": 0.25,
-    "amber_3h": 0.203,
+    "amber_3h": 0.194,
     "red_3h": 0.02,
     "tc3_6h": 0.24
   },
-  "v3_grid_ts": "202608261806",
+  "v3_grid_ts": "202608261854",
   "official_levels": {},
   "tc": null,
   "tc_scanned": [],
