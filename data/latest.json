@@ -1,22 +1,25 @@
 {
-  "ts": "2026-08-27T09:28:40+00:00",
-  "temp_mean": 28.9,
-  "hum_mean": 84.0,
-  "rain_total": 0,
-  "rain_main": 0,
+  "ts": "2026-08-27T20:19:24+00:00",
+  "temp_mean": 27.8,
+  "hum_mean": 85.0,
+  "rain_total": 123,
+  "rain_main": 54,
   "rain_1h": 0.0,
   "rain_3h": 0.0,
-  "active_warnings": [],
+  "active_warnings": [
+    "Thunderstorm Warning (EXTEND)"
+  ],
   "special_tips": [
+    "Widespread heavy rain may affect Hong Kong in a couple of hours. Members of the public should be on the alert.",
     "Special Landslip Advisory: Rain has been particularly heavy in Po Toi Island and Sai Kung East; and may cause landslides. Pay special attention to landslide risk and stay away from slopes. If landslide occurs nearby, leave immediately and call the Police under safe conditions."
   ],
   "predictions": {
-    "rain_1h": 0.1,
-    "amber_3h": 0.02,
+    "rain_1h": 0.25,
+    "amber_3h": 0.201,
     "red_3h": 0.02,
     "tc3_6h": 0.24
   },
-  "v3_grid_ts": "202608271742",
+  "v3_grid_ts": "202608280430",
   "official_levels": {},
   "tc": null,
   "tc_scanned": [],
