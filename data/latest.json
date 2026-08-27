@@ -1,26 +1,23 @@
 {
-  "ts": "2026-08-26T23:22:20+00:00",
-  "temp_mean": 26.4,
-  "hum_mean": 96.0,
-  "rain_total": 275,
-  "rain_main": 46,
+  "ts": "2026-08-27T09:28:40+00:00",
+  "temp_mean": 28.9,
+  "hum_mean": 84.0,
+  "rain_total": 0,
+  "rain_main": 0,
   "rain_1h": 0.0,
   "rain_3h": 0.0,
-  "active_warnings": [
-    "Rainstorm Warning Signal (ISSUE)",
-    "Thunderstorm Warning (EXTEND)"
+  "active_warnings": [],
+  "special_tips": [
+    "Special Landslip Advisory: Rain has been particularly heavy in Po Toi Island and Sai Kung East; and may cause landslides. Pay special attention to landslide risk and stay away from slopes. If landslide occurs nearby, leave immediately and call the Police under safe conditions."
   ],
-  "special_tips": [],
   "predictions": {
-    "rain_1h": 0.45,
-    "amber_3h": 0.26,
-    "red_3h": 0.37,
+    "rain_1h": 0.1,
+    "amber_3h": 0.02,
+    "red_3h": 0.02,
     "tc3_6h": 0.24
   },
-  "v3_grid_ts": "202608270730",
-  "official_levels": {
-    "w_RAIN_RED": "Red Rainstorm"
-  },
+  "v3_grid_ts": "202608271742",
+  "official_levels": {},
   "tc": null,
   "tc_scanned": [],
   "blend_ai_weight": {
