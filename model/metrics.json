@@ -1,59 +1,59 @@
 {
-  "n_total": 240863,
-  "generated": "2026-08-26T04:06:39",
+  "n_total": 240877,
+  "generated": "2026-08-27T14:19:17",
   "targets": {
     "rain_1h": {
-      "n_samples": 239526,
-      "n_pos": 37,
-      "n_val": 47906,
-      "n_val_pos": 37,
+      "n_samples": 239531,
+      "n_pos": 39,
+      "n_val": 47907,
+      "n_val_pos": 39,
       "status": "skipped (a fold has a single class \u2014 need more positives)"
     },
     "amber_3h": {
-      "n_samples": 240766,
-      "n_pos": 3152,
-      "n_val": 48154,
-      "n_val_pos": 836,
+      "n_samples": 240779,
+      "n_pos": 3156,
+      "n_val": 48156,
+      "n_val_pos": 840,
       "lr": {
-        "pr_auc": 0.2519,
-        "brier": 0.0935
+        "pr_auc": 0.2522,
+        "brier": 0.0936
       },
       "trees": {
-        "pr_auc": 0.2489,
-        "brier": 0.0684
+        "pr_auc": 0.242,
+        "brier": 0.0683
       },
       "model": "lr",
       "calibrated": true,
-      "pr_auc": 0.2519,
-      "brier": 0.0148,
+      "pr_auc": 0.2522,
+      "brier": 0.0149,
       "persistence": {
-        "pr_auc": 0.2312,
-        "brier": 0.0149
+        "pr_auc": 0.2293,
+        "brier": 0.015
       },
       "climatology": {
-        "brier": 0.0171
+        "brier": 0.0172
       },
       "ships": true,
       "blend_w": 0.7,
-      "blend_brier": 0.0144,
+      "blend_brier": 0.0145,
       "status": "shipped"
     },
     "red_3h": {
-      "n_samples": 240766,
+      "n_samples": 240779,
       "n_pos": 592,
-      "n_val": 48154,
+      "n_val": 48156,
       "n_val_pos": 172,
       "lr": {
-        "pr_auc": 0.1367,
-        "brier": 0.0855
+        "pr_auc": 0.1364,
+        "brier": 0.0857
       },
       "trees": {
-        "pr_auc": 0.1074,
-        "brier": 0.0193
+        "pr_auc": 0.0854,
+        "brier": 0.0205
       },
       "model": "lr",
       "calibrated": true,
-      "pr_auc": 0.1367,
+      "pr_auc": 0.1364,
       "brier": 0.0034,
       "persistence": {
         "pr_auc": 0.1658,
@@ -66,21 +66,21 @@
       "status": "rules-only (did not beat persistence baseline)"
     },
     "tc3_6h": {
-      "n_samples": 240827,
+      "n_samples": 240843,
       "n_pos": 2806,
-      "n_val": 48166,
+      "n_val": 48169,
       "n_val_pos": 788,
       "lr": {
-        "pr_auc": 0.0533,
-        "brier": 0.2216
+        "pr_auc": 0.0531,
+        "brier": 0.2218
       },
       "trees": {
-        "pr_auc": 0.0573,
-        "brier": 0.1246
+        "pr_auc": 0.0571,
+        "brier": 0.1254
       },
       "model": "trees",
       "calibrated": true,
-      "pr_auc": 0.0573,
+      "pr_auc": 0.0571,
       "brier": 0.0158,
       "persistence": {
         "pr_auc": 0.6863,
@@ -95,6 +95,6 @@
   },
   "train_range": [
     "1998-01-01T00:00:00+00:00",
-    "2026-08-26T03:14:40+00:00"
+    "2026-08-27T09:28:40+00:00"
   ]
 }
