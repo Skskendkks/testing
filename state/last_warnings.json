@@ -1,12 +1,11 @@
 {
   "warnsum": {
-    "WTS": {
-      "name": "Thunderstorm Warning",
-      "code": "WTS",
+    "WHOT": {
+      "name": "Very Hot Weather Warning",
+      "code": "WHOT",
       "actionCode": "ISSUE",
-      "issueTime": "2026-08-29T02:11:00+08:00",
-      "expireTime": "2026-08-29T04:00:00+08:00",
-      "updateTime": "2026-08-29T02:11:00+08:00"
+      "issueTime": "2026-08-29T08:40:00+08:00",
+      "updateTime": "2026-08-29T08:40:00+08:00"
     }
   },
   "levels": {}
