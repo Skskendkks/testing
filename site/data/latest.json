@@ -1,23 +1,22 @@
 {
-  "ts": "2026-08-31T13:33:01+00:00",
-  "temp_mean": 26.7,
-  "hum_mean": 88.0,
-  "rain_total": 33,
-  "rain_main": 9,
+  "ts": "2026-08-31T19:57:48+00:00",
+  "temp_mean": 26.4,
+  "hum_mean": 82.0,
+  "rain_total": 0,
+  "rain_main": 0,
   "rain_1h": 0.0,
   "rain_3h": 0.0,
   "active_warnings": [
-    "Thunderstorm Warning (EXTEND)",
     "Tropical Cyclone Warning Signal (ISSUE)"
   ],
   "special_tips": [],
   "predictions": {
-    "rain_1h": 0.25,
-    "amber_3h": 0.207,
+    "rain_1h": 0.1,
+    "amber_3h": 0.019,
     "red_3h": 0.02,
     "tc3_6h": 0.54
   },
-  "v3_grid_ts": "202608312142",
+  "v3_grid_ts": "202609010406",
   "official_levels": {
     "w_TC1": "TC Signal No. 1"
   },

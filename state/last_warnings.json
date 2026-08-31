@@ -1,13 +1,5 @@
 {
   "warnsum": {
-    "WTS": {
-      "name": "Thunderstorm Warning",
-      "code": "WTS",
-      "actionCode": "EXTEND",
-      "issueTime": "2026-08-31T17:07:00+08:00",
-      "expireTime": "2026-08-31T23:00:00+08:00",
-      "updateTime": "2026-08-31T20:35:00+08:00"
-    },
     "WTCSGNL": {
       "name": "Tropical Cyclone Warning Signal",
       "code": "TC1",
