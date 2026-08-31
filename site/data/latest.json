@@ -1,25 +1,25 @@
 {
-  "ts": "2026-08-31T05:21:38+00:00",
+  "ts": "2026-08-31T13:33:01+00:00",
   "temp_mean": 26.7,
-  "hum_mean": 91.0,
-  "rain_total": 385,
-  "rain_main": 43,
+  "hum_mean": 88.0,
+  "rain_total": 33,
+  "rain_main": 9,
   "rain_1h": 0.0,
   "rain_3h": 0.0,
   "active_warnings": [
-    "Rainstorm Warning Signal (ISSUE)",
-    "Thunderstorm Warning (EXTEND)"
+    "Thunderstorm Warning (EXTEND)",
+    "Tropical Cyclone Warning Signal (ISSUE)"
   ],
   "special_tips": [],
   "predictions": {
-    "rain_1h": 0.45,
-    "amber_3h": 0.3,
-    "red_3h": 0.27,
-    "tc3_6h": 0.24
+    "rain_1h": 0.25,
+    "amber_3h": 0.207,
+    "red_3h": 0.02,
+    "tc3_6h": 0.54
   },
-  "v3_grid_ts": "202608311330",
+  "v3_grid_ts": "202608312142",
   "official_levels": {
-    "w_RAIN_AMBER": "Amber Rainstorm"
+    "w_TC1": "TC Signal No. 1"
   },
   "tc": null,
   "tc_scanned": [],

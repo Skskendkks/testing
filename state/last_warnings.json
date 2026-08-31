@@ -1,25 +1,25 @@
 {
   "warnsum": {
-    "WRAIN": {
-      "name": "Rainstorm Warning Signal",
-      "code": "WRAINA",
-      "type": "Amber",
-      "actionCode": "ISSUE",
-      "issueTime": "2026-08-31T12:25:00+08:00",
-      "updateTime": "2026-08-31T12:25:00+08:00"
-    },
     "WTS": {
       "name": "Thunderstorm Warning",
       "code": "WTS",
       "actionCode": "EXTEND",
-      "issueTime": "2026-08-31T11:30:00+08:00",
-      "expireTime": "2026-08-31T15:00:00+08:00",
-      "updateTime": "2026-08-31T12:35:00+08:00"
+      "issueTime": "2026-08-31T17:07:00+08:00",
+      "expireTime": "2026-08-31T23:00:00+08:00",
+      "updateTime": "2026-08-31T20:35:00+08:00"
+    },
+    "WTCSGNL": {
+      "name": "Tropical Cyclone Warning Signal",
+      "code": "TC1",
+      "actionCode": "ISSUE",
+      "type": "Standby Signal No. 1",
+      "issueTime": "2026-08-31T18:10:00+08:00",
+      "updateTime": "2026-08-31T18:10:00+08:00"
     }
   },
   "levels": {
-    "w_RAIN_AMBER": true,
-    "w_RAIN_RED": false,
-    "w_RAIN_BLACK": false
+    "w_TC1": true,
+    "w_TC3": false,
+    "w_TC8": false
   }
 }
