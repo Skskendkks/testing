@@ -1,22 +1,25 @@
 {
-  "ts": "2026-08-31T23:45:33+00:00",
-  "temp_mean": 26.5,
-  "hum_mean": 83.0,
-  "rain_total": 1,
-  "rain_main": 1,
+  "ts": "2026-09-01T04:56:33+00:00",
+  "temp_mean": 26.1,
+  "hum_mean": 93.0,
+  "rain_total": 202,
+  "rain_main": 26,
   "rain_1h": 0.0,
   "rain_3h": 0.0,
   "active_warnings": [
+    "Thunderstorm Warning (UPDATE)",
     "Tropical Cyclone Warning Signal (ISSUE)"
   ],
-  "special_tips": [],
+  "special_tips": [
+    "Intense gusts reaching 80 kilometres per hour or above may affect Hong Kong. Members of public should seek safe shelter as soon as possible."
+  ],
   "predictions": {
-    "rain_1h": 0.1,
-    "amber_3h": 0.02,
+    "rain_1h": 0.45,
+    "amber_3h": 0.258,
     "red_3h": 0.02,
     "tc3_6h": 0.54
   },
-  "v3_grid_ts": "202609010754",
+  "v3_grid_ts": "202609011306",
   "official_levels": {
     "w_TC1": "TC Signal No. 1"
   },
