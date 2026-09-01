@@ -1,6 +1,6 @@
 {
-  "n_total": 240892,
-  "generated": "2026-08-31T09:53:58",
+  "n_total": 240896,
+  "generated": "2026-09-01T08:45:23",
   "targets": {
     "rain_1h": {
       "n_samples": 239531,
@@ -66,7 +66,7 @@
       "status": "rules-only (did not beat persistence baseline)"
     },
     "tc3_6h": {
-      "n_samples": 240851,
+      "n_samples": 240853,
       "n_pos": 2806,
       "n_val": 48171,
       "n_val_pos": 788,
@@ -75,12 +75,12 @@
         "brier": 0.2219
       },
       "trees": {
-        "pr_auc": 0.0571,
-        "brier": 0.1255
+        "pr_auc": 0.0566,
+        "brier": 0.1266
       },
       "model": "trees",
       "calibrated": true,
-      "pr_auc": 0.0571,
+      "pr_auc": 0.0566,
       "brier": 0.0158,
       "persistence": {
         "pr_auc": 0.6863,
@@ -95,6 +95,6 @@
   },
   "train_range": [
     "1998-01-01T00:00:00+00:00",
-    "2026-08-31T05:21:38+00:00"
+    "2026-09-01T04:56:33+00:00"
   ]
 }
