@@ -1,7 +1,7 @@
 {
-  "ts": "2026-09-02T14:22:01+00:00",
-  "temp_mean": 27.5,
-  "hum_mean": 70.0,
+  "ts": "2026-09-02T18:35:51+00:00",
+  "temp_mean": 26.5,
+  "hum_mean": 69.0,
   "rain_total": 0,
   "rain_main": 0,
   "rain_1h": 0.0,
@@ -16,7 +16,7 @@
     "red_3h": 0.02,
     "tc3_6h": 0.54
   },
-  "v3_grid_ts": "202609022230",
+  "v3_grid_ts": "202609030254",
   "official_levels": {
     "w_TC1": "TC Signal No. 1"
   },
