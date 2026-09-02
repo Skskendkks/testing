@@ -1,22 +1,22 @@
 {
-  "ts": "2026-09-02T00:00:47+00:00",
-  "temp_mean": 25.6,
-  "hum_mean": 86.0,
+  "ts": "2026-09-02T04:19:08+00:00",
+  "temp_mean": 28.9,
+  "hum_mean": 75.0,
   "rain_total": 0,
   "rain_main": 0,
   "rain_1h": 0.0,
-  "rain_3h": -1.0,
+  "rain_3h": 0.0,
   "active_warnings": [
     "Tropical Cyclone Warning Signal (ISSUE)"
   ],
   "special_tips": [],
   "predictions": {
     "rain_1h": 0.1,
-    "amber_3h": 0.021,
+    "amber_3h": 0.018,
     "red_3h": 0.02,
     "tc3_6h": 0.54
   },
-  "v3_grid_ts": "202609020818",
+  "v3_grid_ts": "202609021230",
   "official_levels": {
     "w_TC1": "TC Signal No. 1"
   },
