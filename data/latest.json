@@ -1,7 +1,7 @@
 {
-  "ts": "2026-09-02T04:19:08+00:00",
-  "temp_mean": 28.9,
-  "hum_mean": 75.0,
+  "ts": "2026-09-02T09:29:51+00:00",
+  "temp_mean": 29.8,
+  "hum_mean": 67.0,
   "rain_total": 0,
   "rain_main": 0,
   "rain_1h": 0.0,
@@ -12,11 +12,11 @@
   "special_tips": [],
   "predictions": {
     "rain_1h": 0.1,
-    "amber_3h": 0.018,
+    "amber_3h": 0.017,
     "red_3h": 0.02,
     "tc3_6h": 0.54
   },
-  "v3_grid_ts": "202609021230",
+  "v3_grid_ts": "202609021742",
   "official_levels": {
     "w_TC1": "TC Signal No. 1"
   },
