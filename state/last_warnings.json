@@ -2,16 +2,12 @@
   "warnsum": {
     "WTCSGNL": {
       "name": "Tropical Cyclone Warning Signal",
-      "code": "TC1",
-      "actionCode": "ISSUE",
-      "type": "Standby Signal No. 1",
-      "issueTime": "2026-08-31T18:10:00+08:00",
-      "updateTime": "2026-08-31T18:10:00+08:00"
+      "code": "CANCEL",
+      "actionCode": "CANCEL",
+      "type": "Cancel All Signals",
+      "issueTime": "2026-09-04T00:10:00+08:00",
+      "updateTime": "2026-09-04T00:10:00+08:00"
     }
   },
-  "levels": {
-    "w_TC1": true,
-    "w_TC3": false,
-    "w_TC8": false
-  }
+  "levels": {}
 }

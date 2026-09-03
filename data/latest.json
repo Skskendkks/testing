@@ -1,13 +1,13 @@
 {
-  "ts": "2026-09-03T14:25:14+00:00",
-  "temp_mean": 27.6,
-  "hum_mean": 70.0,
+  "ts": "2026-09-03T18:33:09+00:00",
+  "temp_mean": 26.9,
+  "hum_mean": 71.0,
   "rain_total": 0,
   "rain_main": 0,
   "rain_1h": 0.0,
   "rain_3h": 0.0,
   "active_warnings": [
-    "Tropical Cyclone Warning Signal (ISSUE)"
+    "Tropical Cyclone Warning Signal (CANCEL)"
   ],
   "special_tips": [],
   "predictions": {
@@ -16,10 +16,8 @@
     "red_3h": 0.02,
     "tc3_6h": 0.54
   },
-  "v3_grid_ts": "202609032242",
-  "official_levels": {
-    "w_TC1": "TC Signal No. 1"
-  },
+  "v3_grid_ts": "202609040242",
+  "official_levels": {},
   "tc": null,
   "tc_scanned": [],
   "blend_ai_weight": {
