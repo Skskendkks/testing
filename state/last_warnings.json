@@ -1,13 +1,4 @@
 {
-  "warnsum": {
-    "WTCSGNL": {
-      "name": "Tropical Cyclone Warning Signal",
-      "code": "CANCEL",
-      "actionCode": "CANCEL",
-      "type": "Cancel All Signals",
-      "issueTime": "2026-09-04T00:10:00+08:00",
-      "updateTime": "2026-09-04T00:10:00+08:00"
-    }
-  },
+  "warnsum": {},
   "levels": {}
 }
