@@ -1,7 +1,7 @@
 {
-  "ts": "2026-09-06T19:03:49+00:00",
-  "temp_mean": 26.3,
-  "hum_mean": 88.0,
+  "ts": "2026-09-06T21:16:11+00:00",
+  "temp_mean": 26.4,
+  "hum_mean": 86.0,
   "rain_total": 0,
   "rain_main": 0,
   "rain_1h": 0.0,
@@ -10,11 +10,11 @@
   "special_tips": [],
   "predictions": {
     "rain_1h": 0.1,
-    "amber_3h": 0.022,
+    "amber_3h": 0.021,
     "red_3h": 0.02,
     "tc3_6h": 0.24
   },
-  "v3_grid_ts": "202609070318",
+  "v3_grid_ts": "202609070530",
   "official_levels": {},
   "tc": null,
   "tc_scanned": [],
