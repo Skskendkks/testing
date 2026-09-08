@@ -21,8 +21,8 @@
       "f3_mean",
       "f3_trend"
     ],
-    "n_total": 240934,
-    "generated": "2026-09-07T08:27:12"
+    "n_total": 240939,
+    "generated": "2026-09-08T08:11:48"
   },
   "targets": {
     "rain_1h": 0.0,
