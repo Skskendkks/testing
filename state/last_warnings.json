@@ -1,4 +1,12 @@
 {
-  "warnsum": {},
+  "warnsum": {
+    "WMSGNL": {
+      "name": "Strong Monsoon Signal",
+      "code": "WMSGNL",
+      "actionCode": "ISSUE",
+      "issueTime": "2026-09-12T23:00:00+08:00",
+      "updateTime": "2026-09-12T23:00:00+08:00"
+    }
+  },
   "levels": {}
 }
