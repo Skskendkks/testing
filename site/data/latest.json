@@ -1,22 +1,22 @@
 {
-  "ts": "2026-09-12T22:11:41+00:00",
-  "temp_mean": 27.1,
-  "hum_mean": 79.0,
+  "ts": "2026-09-13T00:52:23+00:00",
+  "temp_mean": 27.0,
+  "hum_mean": 77.0,
   "rain_total": 2,
   "rain_main": 1,
   "rain_1h": 0.0,
-  "rain_3h": 1.0,
+  "rain_3h": 0.0,
   "active_warnings": [
     "Strong Monsoon Signal (ISSUE)"
   ],
   "special_tips": [],
   "predictions": {
     "rain_1h": 0.1,
-    "amber_3h": 0.019,
+    "amber_3h": 0.018,
     "red_3h": 0.02,
     "tc3_6h": 0.24
   },
-  "v3_grid_ts": "202609130630",
+  "v3_grid_ts": "202609130906",
   "official_levels": {},
   "tc": null,
   "tc_scanned": [],
