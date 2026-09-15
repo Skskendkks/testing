@@ -13,10 +13,17 @@ v4 changes vs the old backfill:
   * Merges with the existing dataset (dedupe by snapshot time) so repeated
     workflow_dispatch runs extend coverage.
 
+v4.1: every run ALSO writes f3_max / f3_mean / f3_trend (+ f3_ok=1) into the
+matching hourly rows of data/snapshots.csv (disable with --no-tabular-f3), so
+the tabular models can be trained on rows that actually carry F3 rain
+information (train.py switches to F3-only rows automatically once enough
+exist). The existing "f3-events" workflow mode therefore needs no YAML change.
+
 Usage:
     python app/backfill.py 7                                # last 7 days (recent top-up)
     python app/backfill.py --range 2025-04-01 2025-10-31 --events
     python app/backfill.py --range 2025-06-01 2025-06-30    # every day in range
+    python app/backfill.py --range 2023-01-01 2026-08-01 --events --no-cnn
 """
 
 import argparse
@@ -35,7 +42,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from grid import N_LEADS, downsample, parse_grid_csv, window_indices
+from grid import N_LEADS, downsample, f3_scalars, parse_grid_csv, window_indices
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "data"
@@ -154,6 +161,50 @@ def save_dataset(X, y, B, T):
         print(f"  {name}: {int(ya[:, k].sum())} positives / {ya.shape[0]}")
 
 
+F3_MATCH_MINUTES = 20   # hourly snapshot row <-> nearest F3 snapshot tolerance
+
+
+def write_f3_to_snapshots(all_snap):
+    """Attach f3_* scalars to the hourly rows of snapshots.csv nearest each F3 snapshot."""
+    if not SNAPSHOT_CSV.exists():
+        print("[backfill] snapshots.csv missing — nothing to attach F3 features to")
+        return
+    from fetch import CSV_COLUMNS
+    with open(SNAPSHOT_CSV, newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    all_snap.sort(key=lambda s: s[0])
+    times = [s[0] for s in all_snap]
+    updated = 0
+    for r in rows:
+        if str(r.get("f3_ok", "")) == "1":
+            continue  # live row (or already backfilled) — keep the real-time value
+        try:
+            ts = datetime.fromisoformat(r["ts"])
+        except (KeyError, ValueError):
+            continue
+        if ts.tzinfo is None:
+            ts = ts.replace(tzinfo=timezone.utc)
+        k = bisect_left(times, ts)
+        best = None
+        for m in (k - 1, k):
+            if 0 <= m < len(times):
+                gap = abs((times[m] - ts).total_seconds()) / 60.0
+                if gap <= F3_MATCH_MINUTES and (best is None or gap < best[1]):
+                    best = (m, gap)
+        if best is None:
+            continue
+        r.update(f3_scalars(all_snap[best[0]][1]))
+        r["f3_ok"] = 1
+        updated += 1
+    with open(SNAPSHOT_CSV, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=CSV_COLUMNS, extrasaction="ignore")
+        w.writeheader()
+        for r in rows:
+            w.writerow(r)
+    n_ok = sum(1 for r in rows if str(r.get("f3_ok", "")) == "1")
+    print(f"[backfill] F3 scalars attached to {updated} snapshot rows (f3_ok rows now: {n_ok}/{len(rows)})")
+
+
 def event_days_from_snapshots(start, end):
     """HK dates with any rain warning active, from backfilled/live snapshots.csv."""
     days = set()
@@ -246,6 +297,9 @@ def main():
     ap.add_argument("--events", action="store_true",
                     help="within --range, fetch only rain-warning days + equal random quiet days")
     ap.add_argument("--max-days", type=int, default=0, help="cap number of days fetched")
+    ap.add_argument("--no-tabular-f3", action="store_true",
+                    help="do NOT write f3_* scalars into matching hourly rows of data/snapshots.csv")
+    ap.add_argument("--no-cnn", action="store_true", help="skip building grid_dataset.npz")
     args = ap.parse_args()
 
     days = pick_days(args)
@@ -259,6 +313,10 @@ def main():
             print(f"[backfill] {d:%Y-%m-%d}: failed ({e}) — skipping")
     if not all_snap:
         print("[backfill] no snapshots fetched")
+        return
+    if not args.no_tabular_f3:
+        write_f3_to_snapshots(all_snap)
+    if args.no_cnn:
         return
     X, y, B, T = build_samples(all_snap)
     if not X:

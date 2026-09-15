@@ -1,0 +1,61 @@
+name: backfill
+
+# One-off manual runs only (v4 P1/P2) — backfills cost Actions minutes once, not monthly.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "What to backfill"
+        required: true
+        default: "tabular"
+        type: choice
+        options: [tabular, f3-events, f3-range, f3-tabular, both]
+      start:
+        description: "Start: YYYY (tabular) or YYYY-MM-DD (f3 modes)"
+        required: true
+      end:
+        description: "End (inclusive): YYYY (tabular) or YYYY-MM-DD (f3 modes)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install --quiet numpy
+
+      - name: Backfill tabular (NOAA ISD-Lite hourly + warndb labels)
+        if: ${{ inputs.mode == 'tabular' || inputs.mode == 'both' }}
+        run: python app/backfill_tabular.py "${{ inputs.start }}" "${{ inputs.end }}"
+
+      - name: Backfill F3 grids (event days + quiet days)
+        if: ${{ inputs.mode == 'f3-events' || inputs.mode == 'both' }}
+        run: python app/backfill.py --range "${{ inputs.start }}" "${{ inputs.end }}" --events
+
+      - name: Backfill F3 grids (every day in range)
+        if: ${{ inputs.mode == 'f3-range' }}
+        run: python app/backfill.py --range "${{ inputs.start }}" "${{ inputs.end }}"
+
+      - name: Backfill F3 scalars into snapshots.csv (event + quiet days, no CNN dataset)
+        if: ${{ inputs.mode == 'f3-tabular' }}
+        run: python app/backfill.py --range "${{ inputs.start }}" "${{ inputs.end }}" --events --tabular-f3 --no-cnn
+
+      - name: Commit data
+        run: |
+          git config user.name "testing-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          git diff --cached --quiet || git commit -m "backfill(${{ inputs.mode }}): ${{ inputs.start }}..${{ inputs.end }}"
+          git push

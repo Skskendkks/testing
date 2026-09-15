@@ -1,3 +1,4 @@
 __pycache__/
 *.pyc
 .DS_Store
+data/snapshots.pre_v41.csv

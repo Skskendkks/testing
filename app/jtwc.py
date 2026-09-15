@@ -1,19 +1,35 @@
-import gzip
-import io
-import json
+"""V2 tropical-cyclone features.
+
+v4.1 fix: the previous source (NHC ATCF, ftp.nhc.noaa.gov/atcf/btk) only carries
+Atlantic / East & Central Pacific basins (bal*, bep*, bcp*) — it has NO Western
+Pacific files, so find_storms() never returned anything and tc_dist_km was
+always the 2000 km default. Western Pacific warnings come from JTWC itself:
+
+  RSS   https://www.metoc.navy.mil/jtwc/rss/jtwc.rss        (active systems + links)
+  text  https://www.metoc.navy.mil/jtwc/products/wp{NN}{YY}web.txt   (warning text)
+
+The warning text carries the current fix ("WARNING POSITION: ... NEAR 17.2N 127.8W",
+"MAX SUSTAINED WINDS - 050 KT") and 12/24/36/48/72/96/120 h forecast fixes.
+JTWC warnings do not include central pressure, so pressure_mb is None.
+"""
+
 import math
 import re
 import urllib.request
 from datetime import datetime, timezone
 
-BTK_INDEX_URL = "https://ftp.nhc.noaa.gov/atcf/btk/"
-BTK_FILE_URL = "https://ftp.nhc.noaa.gov/atcf/btk/b{basin}{num}{year}.dat"
-AID_FILE_URL = "https://ftp.nhc.noaa.gov/atcf/aid_public/a{basin}{num}{year}.dat.gz"
+JTWC_RSS_URL = "https://www.metoc.navy.mil/jtwc/rss/jtwc.rss"
+JTWC_TEXT_URL = "https://www.metoc.navy.mil/jtwc/products/wp{num}{yy}web.txt"
 
 HK_LAT = 22.3027
 HK_LON = 114.1742
 NEAR_RADIUS_KM = 2500
 REPORT_RADIUS_KM = 1500
+
+_POS_RE = re.compile(r"(\d{6})Z\s*-+\s*(?:NEAR\s+)?(\d{1,2}\.\d)([NS])\s+(\d{1,3}\.\d)([EW])")
+_WIND_RE = re.compile(r"MAX SUSTAINED WINDS\s*-\s*(\d{2,3})\s*KT")
+_FHR_RE = re.compile(r"^\s*(\d{2,3})\s*HRS?,?\s*VALID AT", re.I)
+_RSS_WP_RE = re.compile(r"products/wp(\d{2})(\d{2})web\.txt", re.I)
 
 
 def http_get(url):
@@ -39,95 +55,73 @@ def bearing_deg(lat1, lon1, lat2, lon2):
     return (math.degrees(math.atan2(y, x)) + 360) % 360
 
 
-def parse_latlon(s, is_lat):
-    m = re.fullmatch(r"(\d+)([NSEW])", s.strip())
-    if not m:
-        return None
-    value = int(m.group(1)) / 10.0
-    if is_lat and m.group(2) == "S":
-        value = -value
-    if not is_lat and m.group(2) == "W":
-        value = -value
-    return value
+def parse_warning(text, storm_id):
+    """JTWC warning text -> (current_fix, {forecast_hr: fix}).
 
-
-def parse_fix(fields):
-    lat = parse_latlon(fields[6], True)
-    lon = parse_latlon(fields[7], False)
-    if lat is None or lon is None:
-        return None
-    try:
-        wind = int(fields[8])
-        pressure = int(fields[9] or 0)
-    except ValueError:
-        return None
-    if wind < 20:
-        return None
-    return {"lat": lat, "lon": lon, "wind": wind, "pressure": pressure}
-
-
-def parse_btk(text, storm_id):
-    fixes = []
-    for line in text.splitlines():
-        fields = [f.strip() for f in line.split(",")]
-        if len(fields) < 10:
+    fix = {"dt": datetime (UTC, day/hour/minute from DDHHMMZ), "lat", "lon", "wind"}.
+    Lines are scanned in order: "WARNING POSITION:" starts the current fix,
+    "NN HRS, VALID AT:" starts a forecast fix; the next position / wind line
+    is attached to whichever block is open.
+    """
+    now = datetime.now(timezone.utc)
+    current, forecasts = None, {}
+    open_fhr = None   # 0 = current, N = forecast hour
+    for raw in text.splitlines():
+        line = raw.strip().upper()
+        if "WARNING POSITION" in line:
+            open_fhr = 0
+        m = _FHR_RE.match(line)
+        if m:
+            open_fhr = int(m.group(1))
+        m = _POS_RE.search(line)
+        if m and open_fhr is not None:
+            lat = float(m.group(2)) * (-1 if m.group(3) == "S" else 1)
+            lon = float(m.group(4)) * (-1 if m.group(5) == "W" else 1)
+            ddhhmm = m.group(1)
+            try:
+                dt = now.replace(day=int(ddhhmm[:2]), hour=int(ddhhmm[2:4]),
+                                 minute=int(ddhhmm[4:6]), second=0, microsecond=0)
+            except ValueError:
+                dt = now
+            fix = {"dt": dt, "lat": lat, "lon": lon, "wind": 0}
+            if open_fhr == 0:
+                current = fix
+            else:
+                forecasts[open_fhr] = fix
             continue
-        try:
-            dt = datetime.strptime(fields[2], "%Y%m%d%H")
-        except ValueError:
-            continue
-        fix = parse_fix(fields)
-        if fix:
-            fix["dt"] = dt
-            fixes.append(fix)
-    return sorted(fixes, key=lambda f: f["dt"])
-
-
-def parse_aid_forecasts(text):
-    out = {}
-    for line in text.splitlines():
-        fields = [f.strip() for f in line.split(",")]
-        if len(fields) < 10 or fields[4] != "OFCL":
-            continue
-        try:
-            fhr = int(fields[5])
-        except ValueError:
-            continue
-        fix = parse_fix(fields)
-        if fix:
-            out[fhr] = fix
-    return out
+        m = _WIND_RE.search(line)
+        if m and open_fhr is not None:
+            target = current if open_fhr == 0 else forecasts.get(open_fhr)
+            if target is not None and target["wind"] == 0:
+                target["wind"] = int(m.group(1))
+    if current is None or current["wind"] < 20:
+        return None, {}
+    return current, forecasts
 
 
 def find_storms():
+    """Active Western Pacific systems from the JTWC RSS feed (numbers < 90; 9x = invest/TCFA)."""
     try:
-        listing = http_get(BTK_INDEX_URL).decode("utf-8", "replace")
+        rss = http_get(JTWC_RSS_URL).decode("utf-8", "replace")
     except Exception:
         return []
-    year = str(datetime.now(timezone.utc).year)
-    storms = []
-    for m in re.finditer(r"b([a-z]{2})(\d{2})(\d{4})\.dat", listing):
-        basin, num, y = m.group(1).upper(), m.group(2), m.group(3)
-        if y == year and basin == "WP":
-            storms.append({"basin": basin, "num": num, "id": f"WP{num}"})
+    seen, storms = set(), []
+    for m in _RSS_WP_RE.finditer(rss):
+        num, yy = m.group(1), m.group(2)
+        if int(num) >= 90 or (num, yy) in seen:
+            continue
+        seen.add((num, yy))
+        storms.append({"basin": "WP", "num": num, "yy": yy, "id": f"WP{num}"})
     return storms
 
 
-def fetch_btk(storm):
-    url = BTK_FILE_URL.format(basin=storm["basin"].lower(), num=storm["num"], year=datetime.now(timezone.utc).year)
-    return http_get(url).decode("utf-8", "replace")
+def fetch_warning(storm):
+    return http_get(JTWC_TEXT_URL.format(num=storm["num"], yy=storm["yy"])).decode("utf-8", "replace")
 
 
-def fetch_aid(storm):
-    url = AID_FILE_URL.format(basin=storm["basin"].lower(), num=storm["num"], year=datetime.now(timezone.utc).year)
-    raw = http_get(url)
-    return gzip.decompress(raw).decode("utf-8", "replace")
-
-
-def storm_info(storm, fixes, forecasts):
-    if not fixes:
+def storm_info(storm, latest, forecasts):
+    if not latest:
         return None
-    latest = fixes[-1]
     dist = haversine_km(HK_LAT, HK_LON, latest["lat"], latest["lon"])
     bearing = bearing_deg(HK_LAT, HK_LON, latest["lat"], latest["lon"])
     target_24 = min(forecasts, key=lambda f: abs(f - 24)) if forecasts else None
@@ -138,7 +132,7 @@ def storm_info(storm, fixes, forecasts):
         "lat": round(latest["lat"], 1),
         "lon": round(latest["lon"], 1),
         "wind_kts": latest["wind"],
-        "pressure_mb": latest["pressure"] or None,
+        "pressure_mb": latest.get("pressure") or None,
         "distance_km": round(dist),
         "bearing_deg": round(bearing),
         "forecast_24h_km": round(haversine_km(HK_LAT, HK_LON, forecast["lat"], forecast["lon"])) if forecast else None,
@@ -152,12 +146,12 @@ def scan():
     results = []
     for storm in storms:
         try:
-            fixes = parse_btk(fetch_btk(storm), storm["id"])
-            forecasts = parse_aid_forecasts(fetch_aid(storm)) if fixes else {}
-            info = storm_info(storm, fixes, forecasts)
+            current, forecasts = parse_warning(fetch_warning(storm), storm["id"])
+            info = storm_info(storm, current, forecasts)
             if info:
                 results.append(info)
-        except Exception:
+        except Exception as e:
+            print(f"[jtwc] {storm['id']}: skipped ({e})")
             continue
     near = [s for s in results if s["distance_km"] <= NEAR_RADIUS_KM]
     near.sort(key=lambda s: s["distance_km"])

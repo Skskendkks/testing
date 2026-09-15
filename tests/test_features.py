@@ -53,5 +53,43 @@ class PortableModelArtifactTests(unittest.TestCase):
         self.assertEqual(features.feature_vector(row)[0], 0.0)
 
 
+
+class JtwcWarningParserTests(unittest.TestCase):
+    SAMPLE = """WTPN31 PGTW 121500
+1. TROPICAL STORM 14W (SAMPLE) WARNING NR 019
+   WARNING POSITION:
+   121200Z --- NEAR 19.2N 117.8E
+     MOVEMENT PAST SIX HOURS - 300 DEGREES AT 09 KTS
+   PRESENT WIND DISTRIBUTION:
+   MAX SUSTAINED WINDS - 050 KT, GUSTS 065 KT
+   FORECASTS:
+   12 HRS, VALID AT:
+   130000Z --- 19.9N 116.4E
+   MAX SUSTAINED WINDS - 055 KT, GUSTS 070 KT
+   24 HRS, VALID AT:
+   131200Z --- 20.8N 115.0E
+   MAX SUSTAINED WINDS - 060 KT, GUSTS 075 KT
+"""
+
+    def test_parse_warning_current_and_forecasts(self):
+        import jtwc
+        cur, fc = jtwc.parse_warning(self.SAMPLE, "WP14")
+        self.assertEqual((cur["lat"], cur["lon"], cur["wind"]), (19.2, 117.8, 50))
+        self.assertEqual(sorted(fc), [12, 24])
+        self.assertEqual(fc[24]["wind"], 60)
+        info = jtwc.storm_info({"id": "WP14"}, cur, fc)
+        self.assertLess(info["distance_km"], 600)
+        self.assertTrue(info["moving_toward_hk"])
+        feats = jtwc.snapshot_features({"nearest": info})
+        self.assertEqual(feats["tc_trend_toward"], 1)
+        self.assertLess(feats["tc_dist_km"], 2000)
+
+    def test_rss_regex_skips_invests(self):
+        import jtwc
+        rss = "x products/wp9826web.txt y products/wp1426web.txt z products/ep1526web.txt"
+        ids = [m.group(1) for m in jtwc._RSS_WP_RE.finditer(rss)]
+        self.assertEqual(ids, ["98", "14"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,3 +1,6 @@
+# Rain inputs are mm of mean past-hour rainfall (rain_1h) and the last-3-hour
+# sum (rain_3h) — see features.py. HKO issues Amber at ~30 mm/h and Red at
+# ~50 mm/h over a wide area, so thresholds below are set against those.
 def rule_probs(row):
     temp = float(row.get("temp_mean", 0.0) or 0.0)
     hum = float(row.get("hum_mean", 0.0) or 0.0)
@@ -20,24 +23,24 @@ def rule_probs(row):
         return max(0.0, min(0.95, p))
 
     p_rain = 0.10
-    p_rain += 0.25 * (rain_1h > 0.3)
-    p_rain += 0.25 * (rain_1h > 2.0)
+    p_rain += 0.25 * (rain_1h > 0.5)
+    p_rain += 0.25 * (rain_1h > 3.0)
     p_rain += 0.20 * (hum > 90)
     p_rain += 0.10 * (hum_delta > 2)
     p_rain += 0.15 * w_wts
 
     p_amber = 0.05
-    p_amber += 0.25 * (rain_3h > 15)
-    p_amber += 0.25 * (rain_3h > 30)
+    p_amber += 0.20 * (rain_1h > 10)
+    p_amber += 0.20 * (rain_1h > 20)
+    p_amber += 0.15 * (rain_3h > 30)
     p_amber += 0.15 * (hum > 92)
-    p_amber += 0.15 * (rain_1h > 10)
     p_amber += 0.20 * w_wts
-    p_amber += 0.30 * w_amber
+    p_amber += 0.30 * w_amber   # only matters for display; onset rows exclude this
 
     p_red = 0.02
-    p_red += 0.20 * (rain_3h > 40)
-    p_red += 0.25 * (rain_3h > 60)
-    p_red += 0.15 * (rain_1h > 25)
+    p_red += 0.20 * (rain_1h > 20)
+    p_red += 0.20 * (rain_1h > 35)
+    p_red += 0.15 * (rain_3h > 60)
     p_red += 0.25 * w_amber
     p_red += 0.35 * w_red
 

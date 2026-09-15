@@ -9,11 +9,15 @@ TREES_JSON = MODEL_DIR / "trees.json"
 BLEND_JSON = MODEL_DIR / "blend.json"
 
 # v4: added f3_* (gridded-nowcast scalars), tc_trend_toward, tc_dist_rate.
+# v4.1: rain features re-defined so backfilled and live rows mean the same thing
+#   rain_1h = rainfall in the past hour (mm; live = mean over districts, backfill = station)
+#   rain_3h = sum of the last three hourly rain_1h values
+#   rain_total (district sum / cumulative) dropped — its semantics differed between sources.
+#   Current warning-state flags added so the model sees what the persistence baseline sees.
 # Old model files whose coef length mismatches are ignored at predict time.
 FEATURE_COLS = [
     "temp_mean",
     "hum_mean",
-    "rain_total",
     "rain_1h",
     "rain_3h",
     "hum_1h_delta",
@@ -21,6 +25,11 @@ FEATURE_COLS = [
     "hour",
     "season",
     "w_WTS",
+    "w_TCSGNL",
+    "w_TC1",
+    "w_TC3",
+    "w_RAIN_AMBER",
+    "w_RAIN_RED",
     "tc_dist_km",
     "tc_wind_kts",
     "tc_24h_dist_km",
@@ -37,6 +46,15 @@ FEATURE_DEFAULTS = {
 }
 
 TARGETS = ["rain_1h", "amber_3h", "red_3h", "tc3_6h"]
+
+# Warning targets are ONSET targets: "not in force now, issued within the horizon".
+# TARGET_FLAG is the flag whose onset is predicted; rows where it is already
+# active are excluded from training/eval, and reported as 1.0 (in force) live.
+TARGET_FLAG = {"amber_3h": "w_RAIN_AMBER", "red_3h": "w_RAIN_RED", "tc3_6h": "w_TC3"}
+
+# Escalation baseline (replaces plain persistence, which is identically 0 for
+# onset targets): "the next-lower warning is already in force".
+BASELINE_FLAG = {"amber_3h": "w_WTS", "red_3h": "w_RAIN_AMBER", "tc3_6h": "w_TC1"}
 
 TARGET_LABELS = {
     "rain_1h": "Rain next 1h",

@@ -24,8 +24,14 @@ Requires data/warning_events.csv with columns: type,start,end
 Rows without it are built with all warning flags 0 (features only — labels wrong;
 the script warns loudly and continues only with --allow-no-events).
 
-Semantics note: live rain_total is a sum over ~15-18 district gauges; a single
-station is scaled by --rain-scale (default 15) to approximate that magnitude.
+Semantics (v4.1, aligned with fetch.py):
+  rain_1h  = rainfall in the past hour, mm (station precip1h; live = mean over districts)
+  rain_3h  = sum of the last three hourly rain_1h values
+  rain_total = same as rain_1h here (dashboard-only column, NOT a model feature)
+--rain-scale defaults to 1.0; the old x15 "district-sum" scaling is gone because
+rain_total is no longer a feature. NOTE: ISD-Lite precip for 450070 is almost
+entirely missing, so backfilled rain features are ~all zero — check the
+"rain>0 hours" count printed per year before trusting them.
 Backfilled rows leave TC-track and F3 features blank (train-time defaults apply).
 """
 
@@ -145,11 +151,9 @@ def flags_at(events, ts):
 
 def build_rows(obs, events, rain_scale, csv_columns):
     rows = []
-    rain_cum = 0.0
-    history = []  # (ts, rain_cum, temp, rh)
+    history = []  # (ts, rain_1h, temp, rh)
     for o in obs:
         rain_mm = o["precip1h"] * rain_scale
-        rain_cum += rain_mm
 
         def back(minutes):
             cutoff = o["ts"] - timedelta(minutes=minutes)
@@ -159,17 +163,22 @@ def build_rows(obs, events, rain_scale, csv_columns):
             return None
 
         p60 = back(60 + 5)
-        p180 = back(180 + 5)
+        p120 = back(120 + 5)
+        # rain_3h = this hour + the two previous hourly readings (same as fetch.py)
+        rain_3h = rain_mm
+        for prev in (p60, p120):
+            if prev and prev[0] >= o["ts"] - timedelta(minutes=125):
+                rain_3h += prev[1]
         hk = o["ts"] + HK_OFFSET
         row = dict.fromkeys(csv_columns, 0)
         row.update({
             "ts": o["ts"].isoformat(timespec="seconds"),
             "temp_mean": round(o["temp"], 1) if o["temp"] is not None else "",
             "hum_mean": round(o["rh"], 1) if o["rh"] is not None else "",
-            "rain_total": round(rain_cum, 1),
+            "rain_total": round(rain_mm, 1),
             "rain_main": round(rain_mm, 1),
-            "rain_1h": round(rain_cum - p60[1], 1) if p60 else 0.0,
-            "rain_3h": round(rain_cum - p180[1], 1) if p180 else 0.0,
+            "rain_1h": round(rain_mm, 1),
+            "rain_3h": round(rain_3h, 1),
             "temp_1h_delta": round(o["temp"] - p60[2], 1) if p60 and None not in (o["temp"], p60[2]) else 0.0,
             "hum_1h_delta": round(o["rh"] - p60[3], 1) if p60 and None not in (o["rh"], p60[3]) else 0.0,
             "hour": hk.hour,
@@ -180,7 +189,7 @@ def build_rows(obs, events, rain_scale, csv_columns):
             "tc_trend_toward": "",
         })
         row.update(flags_at(events, o["ts"]))
-        history.append((o["ts"], rain_cum, o["temp"], o["rh"]))
+        history.append((o["ts"], rain_mm, o["temp"], o["rh"]))
         history[:] = history[-8:]
         rows.append(row)
     return rows
@@ -216,8 +225,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("start_year", type=int)
     ap.add_argument("end_year", type=int)
-    ap.add_argument("--rain-scale", type=float, default=15.0,
-                    help="station->district-sum scale factor for rain features")
+    ap.add_argument("--rain-scale", type=float, default=1.0,
+                    help="multiplier on station precip (1.0 = raw mm; legacy x15 no longer needed)")
     ap.add_argument("--station", default=STATION)
     ap.add_argument("--allow-no-events", action="store_true",
                     help="build feature rows even without data/warning_events.csv (labels all 0)")
@@ -246,8 +255,9 @@ def main():
         all_rows.extend(rows)
         n_amber = sum(1 for r in rows if r.get("w_RAIN_AMBER") == 1)
         n_tc3 = sum(1 for r in rows if r.get("w_TC3") == 1)
+        n_rain = sum(1 for r in rows if r.get("rain_1h", 0) > 0)
         print(f"[backfill-tab] {year}: {len(obs)} obs -> {len(rows)} rows "
-              f"(amber-hours={n_amber}, tc3-hours={n_tc3})")
+              f"(amber-hours={n_amber}, tc3-hours={n_tc3}, rain>0 hours={n_rain})")
 
     if not all_rows:
         print("[backfill-tab] nothing fetched — snapshots.csv untouched")

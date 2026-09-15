@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from features import TARGETS, TARGET_LABELS, blend_weights, predict_ai
+from features import TARGETS, TARGET_FLAG, TARGET_LABELS, blend_weights, predict_ai
 import jtwc
 from notify import ai_alert_keys, load_notified, save_notified, send_email
 from rules import rule_probs
@@ -69,6 +69,7 @@ CSV_COLUMNS = [
     "f3_max",
     "f3_mean",
     "f3_trend",
+    "f3_ok",
 ]
 
 WARNSUMS_TO_FLAGS = {
@@ -139,17 +140,25 @@ def _f(row, key):
     return float(row.get(key, 0.0) or 0.0)
 
 
+def row_near(rows, minutes_ago, tolerance=25):
+    """Prior row whose timestamp is closest to now - minutes_ago (within tolerance min)."""
+    target = datetime.now(timezone.utc) - timedelta(minutes=minutes_ago)
+    best, best_gap = None, None
+    for r in rows:
+        try:
+            gap = abs((datetime.fromisoformat(r["ts"]) - target).total_seconds()) / 60.0
+        except (KeyError, ValueError):
+            continue
+        if gap <= tolerance and (best_gap is None or gap < best_gap):
+            best, best_gap = r, gap
+    return best
+
+
 def f3_features(leads):
     """P6: scalar summaries of the F3 gridded nowcast for the tabular models."""
-    if not leads:
-        return {"f3_max": 0.0, "f3_mean": 0.0, "f3_trend": 0.0}
-    maxes = [max(max(r) for r in g) for g in leads]
-    means = [sum(sum(r) for r in g) / (len(g) * len(g[0])) for g in leads]
-    return {
-        "f3_max": round(max(maxes), 2),
-        "f3_mean": round(sum(means) / len(means), 3),
-        "f3_trend": round(maxes[-1] - maxes[0], 2),
-    }
+    out = gridmod.f3_scalars(leads)
+    out["f3_ok"] = 1 if leads else 0   # 1 = real F3 data behind the f3_* values
+    return out
 
 
 def build_row(weather, warnsum, messages, levels, prior_rows, tc_feats, f3_feats=None):
@@ -159,13 +168,19 @@ def build_row(weather, warnsum, messages, levels, prior_rows, tc_feats, f3_feats
     rains = [d["max"] for d in weather.get("rainfall", {}).get("data", []) if isinstance(d.get("max"), (int, float))]
     temp_mean = round(sum(temps) / len(temps), 1) if temps else None
     hum_mean = round(sum(hums) / len(hums), 1) if hums else None
+    # rhrread rainfall = rainfall in the PAST HOUR per district (not cumulative).
+    #   rain_1h    = mean over districts  -> comparable to the single-station backfill
+    #   rain_main  = max over districts   (dashboard only)
+    #   rain_total = sum over districts   (dashboard only; NOT a model feature)
+    #   rain_3h    = this hour + the two previous hourly rain_1h values
     rain_total = round(sum(rains), 1) if rains else None
     rain_main = round(max(rains), 1) if rains else None
+    rain_1h = round(sum(rains) / len(rains), 1) if rains else 0.0
+    prev_1h = row_near(prior_rows, 60)
+    prev_2h = row_near(prior_rows, 120)
+    rain_3h = rain_1h + (_f(prev_1h, "rain_1h") if prev_1h else 0.0) + (_f(prev_2h, "rain_1h") if prev_2h else 0.0)
 
     recent_60 = rows_within(prior_rows, 60)
-    recent_180 = rows_within(prior_rows, 180)
-    rain_1h = rain_total - _f(recent_60[0], "rain_total") if recent_60 else 0.0
-    rain_3h = rain_total - _f(recent_180[0], "rain_total") if recent_180 else 0.0
     hum_1h_delta = (hum_mean - _f(recent_60[0], "hum_mean")) if recent_60 and hum_mean is not None else 0.0
     temp_1h_delta = (temp_mean - _f(recent_60[0], "temp_mean")) if recent_60 and temp_mean is not None else 0.0
 
@@ -197,12 +212,23 @@ def build_row(weather, warnsum, messages, levels, prior_rows, tc_feats, f3_feats
     return row, temps, hums, rains
 
 
-def blend_probs(rules_p, ai_p, w_map):
-    """P5: per-target learned blend weight (falls back to rules where AI is absent)."""
+def active_targets(row):
+    """Onset targets whose warning is already in force right now."""
+    return {t for t, flag in TARGET_FLAG.items() if _f(row, flag) > 0}
+
+
+def blend_probs(rules_p, ai_p, w_map, active=()):
+    """P5: per-target learned blend weight (falls back to rules where AI is absent).
+
+    Models are trained on ONSET (not-in-force -> issued within horizon), so when a
+    warning is already in force the question is settled: report 1.0.
+    """
     out = {}
     for t in TARGETS:
         r = rules_p.get(t, 0.0)
-        if t in ai_p:
+        if t in active:
+            out[t] = 1.0
+        elif t in ai_p:
             w = w_map.get(t, 0.0)
             out[t] = round(r * (1 - w) + ai_p[t] * w, 3)
         else:
@@ -304,6 +330,14 @@ def pages_url():
 
 
 def main():
+    # v4.1: one-time data migration, committed by this workflow's "git add data"
+    try:
+        import migrate_rain_v41
+        if migrate_rain_v41.ensure():
+            print("[poll] applied v4.1 snapshot migration")
+    except Exception as e:
+        print(f"[poll] v4.1 migration skipped: {e}")
+
     weather = http_get(WEATHER_URL)
     warnsum = http_get(WARNSUM_URL)
     messages = weather.get("warningMessage", []) or []
@@ -324,7 +358,8 @@ def main():
     rules_p = rule_probs(row)
     ai_p = predict_ai(row)
     w_map = blend_weights()
-    probs = blend_probs(rules_p, ai_p, w_map)
+    active = active_targets(row)
+    probs = blend_probs(rules_p, ai_p, w_map, active)
 
     v3 = None
     v3_grid_ts = None
@@ -352,7 +387,8 @@ def main():
 
     now = datetime.now(timezone.utc)
     notified = load_notified()
-    alert_keys = ai_alert_keys(probs, notified, now)
+    # warnings already in force are covered by the official-change email, not lead alerts
+    alert_keys = ai_alert_keys({t: p for t, p in probs.items() if t not in active}, notified, now)
     for k in alert_keys:
         notify_lines.append(f"* {TARGET_LABELS[k]}: probability {probs[k]:.0%} (lead alert)")
         notified[k] = now.isoformat(timespec="seconds")

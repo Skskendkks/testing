@@ -91,6 +91,19 @@ def fetch_snapshot():
     return {"ts": endings[0], "leads": leads, "n_leads": len(leads)}
 
 
+def f3_scalars(leads):
+    """Scalar summaries of the downsampled lead frames (shared by fetch.py and backfill.py)."""
+    if not leads:
+        return {"f3_max": 0.0, "f3_mean": 0.0, "f3_trend": 0.0}
+    maxes = [max(max(r) for r in g) for g in leads]
+    means = [sum(sum(r) for r in g) / (len(g) * len(g[0])) for g in leads]
+    return {
+        "f3_max": round(max(maxes), 2),
+        "f3_mean": round(sum(means) / len(means), 3),
+        "f3_trend": round(maxes[-1] - maxes[0], 2),
+    }
+
+
 def lead_input(leads):
     return leads[:3]
 

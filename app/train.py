@@ -6,13 +6,25 @@ Outputs (all pure-Python-consumable at inference; see features.py):
   model/blend.json    — per-target rules-vs-AI blend weight (P5)
   model/metrics.json  — per-target PR-AUC / Brier vs persistence & climatology (P4)
 
-A target "ships" only if the calibrated model beats the persistence baseline
-(current warning state continues) on BOTH PR-AUC and Brier on a time-ordered
-validation split. Otherwise that target stays rules-only (blend weight 0).
+v4.1 changes (methodology fixes):
+  * Warning targets are ONSET labels: rows where the warning is already in
+    force are excluded; label = 1 if it is issued within the horizon.
+  * Time-ordered THREE-WAY split: train (60%) / calibration (20%) / test (20%).
+    Platt calibration and the rules-vs-AI blend weight are fitted on the
+    calibration fold; every reported metric and the ship decision use the
+    untouched test fold.
+  * Baseline is "escalation" (next-lower warning in force) instead of plain
+    persistence, which is identically zero for onset targets.
+  * Metrics are also reported on live-polled rows only (rows with TC/F3
+    features), because backfilled rows lack rain/F3/TC features.
+
+A target "ships" only if the calibrated model beats the baseline on BOTH PR-AUC
+and Brier on the test fold. Otherwise that target stays rules-only (blend weight 0).
 """
 
 import csv
 import json
+import os
 import sys
 from bisect import bisect_right
 from datetime import datetime, timedelta
@@ -20,7 +32,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from features import FEATURE_COLS, TARGETS, apply_cal, feature_vector, sigmoid, _trees_prob
+from features import (
+    BASELINE_FLAG, FEATURE_COLS, TARGET_FLAG, TARGETS, apply_cal, feature_vector, sigmoid,
+    _trees_prob,
+)
 from rules import rule_probs
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -41,13 +56,39 @@ HORIZON_HOURS = {
     "tc3_6h": 6.0,
 }
 
-FLAG = {"amber_3h": "w_RAIN_AMBER", "red_3h": "w_RAIN_RED", "tc3_6h": "w_TC3"}
+FLAG = TARGET_FLAG
 
 MIN_ROWS = 48
-MIN_POSITIVES = 4       # need a few in train AND val
-MIN_CAL_POSITIVES = 5   # minimum val positives to fit Platt calibration
-VAL_FRAC = 0.2
+MIN_POSITIVES = 4       # need a few in every fold
+MIN_CAL_POSITIVES = 5   # minimum calibration-fold positives to fit Platt calibration
+TRAIN_FRAC = 0.6        # time-ordered: first 60% train, next 20% calibration, last 20% test
+CAL_FRAC = 0.2
+RAIN_MM = 1.0           # rain_1h above this counts as "rain"
 EPS = 1e-6
+
+
+MIN_F3_ROWS = 2000      # switch to F3-only training once this many rows carry real F3 data
+
+
+def has_f3(row):
+    return str(row.get("f3_ok", "")) == "1"
+
+
+def select_training_rows(rows):
+    """F3-only mode: once enough rows carry real F3 scalars, train/evaluate on those
+    only, so the model is not dominated by 25 years of rows with f3_*=0 and rain=0.
+    Override with F3_ONLY=0 / F3_ONLY=1 in the environment."""
+    n_f3 = sum(1 for r in rows if has_f3(r))
+    force = os.environ.get("F3_ONLY")
+    use = (force == "1") if force in ("0", "1") else n_f3 >= MIN_F3_ROWS
+    if use and n_f3 > 0:
+        return [r for r in rows if has_f3(r)], {"mode": "f3_only", "n_f3_rows": n_f3}
+    return rows, {"mode": "all_rows", "n_f3_rows": n_f3}
+
+
+def is_live_row(row):
+    """Live-polled rows carry TC-track features; backfilled rows leave them blank."""
+    return row.get("tc_dist_km", "") not in ("", None)
 
 
 def _f(row, key, default=0.0):
@@ -91,8 +132,11 @@ def build_samples(rows, target):
         if not future:
             continue
         if target == "rain_1h":
-            label = 1 if max(_f(fr, "rain_total") for fr in future) - _f(r, "rain_total") > 1.0 else 0
+            # rain_1h of a future row = rainfall in the hour before that row
+            label = 1 if max(_f(fr, "rain_1h") for fr in future) > RAIN_MM else 0
         else:
+            if _f(r, FLAG[target]) > 0:
+                continue  # onset target: warning already in force — not a forecast question
             label = 1 if any(_f(fr, FLAG[target]) > 0 for fr in future) else 0
         X.append(feature_vector(r))
         y.append(label)
@@ -100,16 +144,26 @@ def build_samples(rows, target):
     return X, y, idx
 
 
-def persistence_scores(rows, idx, target):
-    """Baseline (a): current state continues."""
+def baseline_scores(rows, idx, target):
+    """Naive baseline the model must beat.
+
+    rain_1h: persistence (raining now -> raining next hour).
+    warning onset targets: escalation — the next-lower warning is in force now
+    (WTS -> Amber, Amber -> Red, TC1 -> TC3). Plain persistence is always 0 for
+    onset rows, so it is not a meaningful comparator.
+    """
     out = []
     for i in idx:
         r = rows[i]
         if target == "rain_1h":
-            out.append(1.0 if _f(r, "rain_1h") > 1.0 else 0.0)
+            out.append(1.0 if _f(r, "rain_1h") > RAIN_MM else 0.0)
         else:
-            out.append(1.0 if _f(r, FLAG[target]) > 0 else 0.0)
+            out.append(1.0 if _f(r, BASELINE_FLAG[target]) > 0 else 0.0)
     return out
+
+
+def baseline_name(target):
+    return "persistence" if target == "rain_1h" else f"escalation ({BASELINE_FLAG[target]} in force)"
 
 
 def fit_platt(p_val, y_val):
@@ -164,7 +218,13 @@ def blend_search(rules_p, ai_p, y):
 
 
 def main():
-    rows = load_rows()
+    try:
+        import migrate_rain_v41
+        if migrate_rain_v41.ensure():
+            print("[train] applied v4.1 snapshot migration")
+    except Exception as e:
+        print(f"[train] v4.1 migration skipped: {e}")
+    rows, row_mode = select_training_rows(load_rows())
     n = len(rows)
     generated = datetime.now().isoformat(timespec="seconds")
     meta = {
@@ -176,7 +236,7 @@ def main():
     weights_out = {"meta": dict(meta)}
     trees_out = {"meta": dict(meta)}
     blend_out = {"meta": dict(meta), "targets": {t: 0.0 for t in TARGETS}}
-    metrics = {"n_total": n, "generated": generated, "targets": {}}
+    metrics = {"n_total": n, "generated": generated, "rows": row_mode, "targets": {}}
     if rows:
         metrics["train_range"] = [rows[0]["ts"], rows[-1]["ts"]]
 
@@ -206,13 +266,20 @@ def main():
             print(f"[train] {target}: {report['status']}")
             continue
 
-        split = max(1, int(len(y) * (1 - VAL_FRAC)))
-        X_tr, X_va = np.array(X[:split]), np.array(X[split:])
-        y_tr, y_va = np.array(y[:split]), np.array(y[split:])
-        val_idx = idx[split:]
-        report["n_val"] = len(y_va)
-        report["n_val_pos"] = int(y_va.sum())
-        if y_tr.sum() == 0 or y_va.sum() == 0 or y_tr.sum() == len(y_tr):
+        # time-ordered three-way split: train / calibration / test
+        n_s = len(y)
+        i_tr = max(1, int(n_s * TRAIN_FRAC))
+        i_cal = max(i_tr + 1, int(n_s * (TRAIN_FRAC + CAL_FRAC)))
+        X_tr, X_ca, X_te = np.array(X[:i_tr]), np.array(X[i_tr:i_cal]), np.array(X[i_cal:])
+        y_tr, y_ca, y_te = np.array(y[:i_tr]), np.array(y[i_tr:i_cal]), np.array(y[i_cal:])
+        cal_idx, test_idx = idx[i_tr:i_cal], idx[i_cal:]
+        report["n_train"], report["n_train_pos"] = len(y_tr), int(y_tr.sum())
+        report["n_cal"], report["n_cal_pos"] = len(y_ca), int(y_ca.sum())
+        report["n_test"], report["n_test_pos"] = len(y_te), int(y_te.sum())
+        if test_idx:
+            report["test_range"] = [rows[test_idx[0]]["ts"], rows[test_idx[-1]]["ts"]]
+        if (y_tr.sum() == 0 or y_ca.sum() == 0 or y_te.sum() == 0
+                or y_tr.sum() == len(y_tr) or y_te.sum() == len(y_te)):
             report["status"] = "skipped (a fold has a single class — need more positives)"
             print(f"[train] {target}: {report['status']}")
             continue
@@ -223,7 +290,8 @@ def main():
         std[std < 1e-6] = 1e-6
         lr = LogisticRegression(max_iter=2000, class_weight="balanced")
         lr.fit((X_tr - mean) / std, y_tr)
-        p_lr = lr.predict_proba((X_va - mean) / std)[:, 1]
+        p_lr_ca = lr.predict_proba((X_ca - mean) / std)[:, 1]
+        p_lr_te = lr.predict_proba((X_te - mean) / std)[:, 1]
 
         # --- candidate 2: gradient-boosted trees (P3)
         w_pos = len(y_tr) / (2.0 * max(1, y_tr.sum()))
@@ -234,62 +302,89 @@ def main():
             early_stopping=False, random_state=0,
         )
         hgb.fit(X_tr, y_tr, sample_weight=sw)
-        p_hgb = hgb.predict_proba(X_va)[:, 1]
+        p_hgb_ca = hgb.predict_proba(X_ca)[:, 1]
+        p_hgb_te = hgb.predict_proba(X_te)[:, 1]
 
-        ap_lr = float(average_precision_score(y_va, p_lr))
-        ap_hgb = float(average_precision_score(y_va, p_hgb))
-        report["lr"] = {"pr_auc": round(ap_lr, 4), "brier": round(brier(y_va, p_lr), 4)}
-        report["trees"] = {"pr_auc": round(ap_hgb, 4), "brier": round(brier(y_va, p_hgb), 4)}
+        # --- model selection on the CALIBRATION fold (never on test)
+        ap_lr = float(average_precision_score(y_ca, p_lr_ca))
+        ap_hgb = float(average_precision_score(y_ca, p_hgb_ca))
+        report["lr"] = {"cal_pr_auc": round(ap_lr, 4), "cal_brier": round(brier(y_ca, p_lr_ca), 4),
+                        "test_pr_auc": round(float(average_precision_score(y_te, p_lr_te)), 4)}
+        report["trees"] = {"cal_pr_auc": round(ap_hgb, 4), "cal_brier": round(brier(y_ca, p_hgb_ca), 4),
+                           "test_pr_auc": round(float(average_precision_score(y_te, p_hgb_te)), 4)}
 
-        use_trees = ap_hgb > ap_lr or (ap_hgb == ap_lr and brier(y_va, p_hgb) < brier(y_va, p_lr))
+        use_trees = ap_hgb > ap_lr or (ap_hgb == ap_lr and brier(y_ca, p_hgb_ca) < brier(y_ca, p_lr_ca))
         entry = None
         if use_trees:
             try:
                 entry = export_hgb(hgb)
-                if not parity_ok(entry, hgb, X_va[: min(20, len(X_va))]):
+                if not parity_ok(entry, hgb, X_ca[: min(20, len(X_ca))]):
                     print(f"[train] {target}: tree export parity failed — falling back to LR")
                     entry, use_trees = None, False
             except Exception as e:
                 print(f"[train] {target}: tree export failed ({e}) — falling back to LR")
                 entry, use_trees = None, False
-        p_raw = p_hgb if use_trees else p_lr
+        p_raw_ca = p_hgb_ca if use_trees else p_lr_ca
+        p_raw_te = p_hgb_te if use_trees else p_lr_te
 
-        # --- calibration on the val fold (P4)
-        cal = fit_platt(list(p_raw), list(y_va))
-        p_cal = np.array([apply_cal(float(p), cal) for p in p_raw])
-        if brier(y_va, p_cal) > brier(y_va, p_raw):
-            cal, p_cal = None, p_raw  # calibration hurt (tiny fold) — drop it
+        # --- Platt calibration fitted on the calibration fold, applied to test (P4)
+        cal = fit_platt(list(p_raw_ca), list(y_ca))
+        p_cal_ca = np.array([apply_cal(float(p), cal) for p in p_raw_ca])
+        if brier(y_ca, p_cal_ca) > brier(y_ca, p_raw_ca):
+            cal, p_cal_ca = None, p_raw_ca  # calibration hurt (tiny fold) — drop it
+        p_cal_te = np.array([apply_cal(float(p), cal) for p in p_raw_te])
 
-        # --- baselines (P4): persistence + climatology
-        p_pers = np.array(persistence_scores(rows, val_idx, target))
-        p_clim = np.full(len(y_va), float(y_tr.mean()))
-        ap_model = float(average_precision_score(y_va, p_cal))
-        ap_pers = float(average_precision_score(y_va, p_pers))
-        b_model, b_pers, b_clim = brier(y_va, p_cal), brier(y_va, p_pers), brier(y_va, p_clim)
+        # --- baselines on the TEST fold (P4): escalation/persistence + climatology
+        p_base = np.array(baseline_scores(rows, test_idx, target))
+        p_clim = np.full(len(y_te), float(y_tr.mean()))
+        ap_model = float(average_precision_score(y_te, p_cal_te))
+        ap_base = float(average_precision_score(y_te, p_base))
+        b_model, b_base, b_clim = brier(y_te, p_cal_te), brier(y_te, p_base), brier(y_te, p_clim)
         report["model"] = "trees" if use_trees else "lr"
         report["calibrated"] = cal is not None
         report["pr_auc"] = round(ap_model, 4)
         report["brier"] = round(b_model, 4)
-        report["persistence"] = {"pr_auc": round(ap_pers, 4), "brier": round(b_pers, 4)}
+        report["baseline"] = {"name": baseline_name(target),
+                              "pr_auc": round(ap_base, 4), "brier": round(b_base, 4)}
         report["climatology"] = {"brier": round(b_clim, 4)}
 
+        # --- same metrics on live-polled test rows only (the distribution served in production)
+        live_mask = np.array([is_live_row(rows[i]) for i in test_idx], dtype=bool)
+        live = {"n": int(live_mask.sum()), "n_pos": int(y_te[live_mask].sum()) if live_mask.any() else 0}
+        if live["n_pos"] > 0 and live["n_pos"] < live["n"]:
+            live["pr_auc"] = round(float(average_precision_score(y_te[live_mask], p_cal_te[live_mask])), 4)
+            live["brier"] = round(brier(y_te[live_mask], p_cal_te[live_mask]), 4)
+            live["baseline_pr_auc"] = round(float(average_precision_score(y_te[live_mask], p_base[live_mask])), 4)
+            live["baseline_brier"] = round(brier(y_te[live_mask], p_base[live_mask]), 4)
+        else:
+            live["note"] = "too few live positives in the test fold to score"
+        report["live_only"] = live
+
+        # Ship gate: beat the naive baseline on PR-AUC and Brier, AND beat
+        # climatology on Brier (a binary baseline has a poor Brier by construction,
+        # so climatology is the real calibration hurdle for rare events).
         ships = (
-            ap_model >= ap_pers - 1e-9 and b_model <= b_pers + 1e-9
-            and (ap_model > ap_pers + EPS or b_model < b_pers - EPS)
+            ap_model >= ap_base - 1e-9 and b_model <= b_base + 1e-9
+            and (ap_model > ap_base + EPS or b_model < b_base - EPS)
+            and b_model < b_clim - EPS
         )
         report["ships"] = bool(ships)
         if not ships:
-            report["status"] = "rules-only (did not beat persistence baseline)"
-            print(f"[train] {target}: NOT shipped — PR-AUC {ap_model:.3f} vs pers {ap_pers:.3f}, "
-                  f"Brier {b_model:.4f} vs pers {b_pers:.4f}")
+            report["status"] = "rules-only (did not beat baseline/climatology on the test fold)"
+            print(f"[train] {target}: NOT shipped — PR-AUC {ap_model:.3f} vs base {ap_base:.3f}, "
+                  f"Brier {b_model:.4f} vs base {b_base:.4f} / clim {b_clim:.4f}")
             continue
 
-        # --- learned blend weight on the val fold (P5)
-        rules_val = [rule_probs(rows[i])[target] for i in val_idx]
-        w_blend, b_blend = blend_search(rules_val, list(p_cal), list(y_va))
+        # --- learned blend weight on the CALIBRATION fold (P5); its test Brier reported honestly
+        rules_ca = [rule_probs(rows[i])[target] for i in cal_idx]
+        rules_te = [rule_probs(rows[i])[target] for i in test_idx]
+        w_blend, _ = blend_search(rules_ca, list(p_cal_ca), list(y_ca))
+        b_blend_te = sum(((1 - w_blend) * r + w_blend * a - t) ** 2
+                         for r, a, t in zip(rules_te, p_cal_te, y_te)) / len(y_te)
         blend_out["targets"][target] = w_blend
         report["blend_w"] = w_blend
-        report["blend_brier"] = round(b_blend, 4)
+        report["blend_brier_test"] = round(b_blend_te, 4)
+        report["rules_only_brier_test"] = round(brier(y_te, np.array(rules_te)), 4)
 
         if use_trees:
             entry["cal"] = cal
@@ -310,8 +405,8 @@ def main():
                 "n_neg": int(len(y) - sum(y)),
             }
         report["status"] = "shipped"
-        print(f"[train] {target}: shipped {report['model']} — PR-AUC {ap_model:.3f} "
-              f"(pers {ap_pers:.3f}), Brier {b_model:.4f} (pers {b_pers:.4f}), blend w={w_blend}")
+        print(f"[train] {target}: shipped {report['model']} — test PR-AUC {ap_model:.3f} "
+              f"(base {ap_base:.3f}), Brier {b_model:.4f} (base {b_base:.4f}), blend w={w_blend}")
 
     _write_all(weights_out, trees_out, blend_out, metrics)
     shipped = [t for t in TARGETS if metrics["targets"].get(t, {}).get("ships")]
