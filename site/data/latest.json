@@ -1,5 +1,5 @@
 {
-  "ts": "2026-09-15T13:27:21+00:00",
+  "ts": "2026-09-15T16:19:03+00:00",
   "temp_mean": 27.1,
   "hum_mean": 75.0,
   "rain_total": 0,
@@ -14,14 +14,22 @@
     "red_3h": 0.02,
     "tc3_6h": 0.24
   },
-  "v3_grid_ts": "202609152142",
+  "v3_grid_ts": "202609160030",
   "official_levels": {},
   "tc": null,
-  "tc_scanned": [],
+  "tc_scanned": [
+    "WP24"
+  ],
   "blend_ai_weight": {
     "rain_1h": 0.0,
     "amber_3h": 0.7,
     "red_3h": 0.0,
     "tc3_6h": 0.0
-  }
+  },
+  "alert_threshold": {
+    "amber_3h": 0.6,
+    "red_3h": 0.6,
+    "tc3_6h": 0.6
+  },
+  "in_force": []
 }
