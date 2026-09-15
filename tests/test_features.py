@@ -91,5 +91,41 @@ class JtwcWarningParserTests(unittest.TestCase):
         self.assertEqual(ids, ["98", "14"])
 
 
+class TrainerLogicTests(unittest.TestCase):
+    def _rows(self, flags):
+        from datetime import datetime, timedelta, timezone
+        t0 = datetime(2026, 6, 1, tzinfo=timezone.utc)
+        rows = []
+        for i, fl in enumerate(flags):
+            r = {name: 0.0 for name in features.FEATURE_COLS}
+            r["ts"] = (t0 + timedelta(hours=i)).isoformat()
+            r["_dt"] = t0 + timedelta(hours=i)
+            r["w_RAIN_AMBER"] = fl
+            rows.append(r)
+        return rows
+
+    def test_onset_labels_skip_rows_already_in_force(self):
+        import train
+        # amber in force at hours 4-5; horizon 3h -> hours 1,2,3 are onset positives, 4,5 excluded
+        rows = self._rows([0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0])
+        X, y, idx = train.build_samples(rows, "amber_3h")
+        self.assertNotIn(4, idx)
+        self.assertNotIn(5, idx)
+        lab = dict(zip(idx, y))
+        self.assertEqual([lab[1], lab[2], lab[3]], [1, 1, 1])
+        self.assertEqual(lab[0], 0)
+
+    def test_alert_threshold_respects_precision_floor(self):
+        import train
+        p = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.05]
+        y = [1, 1, 1, 0, 0, 0, 0, 0, 0, 0]
+        # lowest threshold whose cumulative precision stays >= 0.30: all 10 rows (3/10)
+        self.assertEqual(train.alert_threshold(p, y), 0.05)
+        p2 = p + [0.04] * 5                     # extra negatives push the tail below 0.30
+        self.assertEqual(train.alert_threshold(p2, y + [0] * 5), 0.05)
+        self.assertIsNone(train.alert_threshold(p, [1] + [0] * 9))   # < ALERT_MIN_HITS
+        self.assertIsNone(train.alert_threshold(p, [0] * 10))
+
+
 if __name__ == "__main__":
     unittest.main()

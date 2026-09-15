@@ -27,6 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 CSV = ROOT / "data" / "snapshots.csv"
 BACKUP = ROOT / "data" / "snapshots.pre_v41.csv"
 MARKER = ROOT / "data" / ".v41_migrated"
+MARKER_V42 = ROOT / "data" / ".v42_migrated"
 N_DISTRICTS = 18  # rhrread rainfall districts; approximate for already-collected rows
 
 
@@ -42,11 +43,39 @@ def is_live(row):
 
 
 def ensure():
-    """Run the migration if it has not been applied yet (idempotent via marker file)."""
-    if MARKER.exists():
-        return False
-    main()
-    return True
+    """Apply any migration not yet applied (idempotent via marker files). Returns True if something ran."""
+    ran = False
+    if not MARKER.exists():
+        main()
+        ran = True
+    if not MARKER_V42.exists():
+        v42()
+        ran = True
+    return ran
+
+
+def v42():
+    """v4.2: add `live` (1 = polled in real time) and the rolling f3_max_1h / f3_max_3h columns."""
+    if not CSV.exists():
+        return
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from fetch import CSV_COLUMNS
+    from backfill import add_f3_rolling
+    with open(CSV, newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    rows.sort(key=lambda r: r["ts"])
+    for r in rows:
+        if str(r.get("live", "")).strip() not in ("0", "1"):
+            r["live"] = 1 if is_live(r) else 0
+    add_f3_rolling(rows)
+    with open(CSV, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=CSV_COLUMNS, extrasaction="ignore")
+        w.writeheader()
+        for r in rows:
+            w.writerow(r)
+    MARKER_V42.write_text(datetime.now().isoformat(timespec="seconds") + "\n", encoding="utf-8")
+    print(f"[migrate] v4.2 columns added: live=1 on {sum(1 for r in rows if str(r['live']) == '1')} rows")
 
 
 def main():
@@ -74,11 +103,13 @@ def main():
     for r in rows:
         if is_live(r):
             n_live += 1
+            r["live"] = 1
             r["rain_1h"] = round(_f(r["rain_total"]) / N_DISTRICTS, 1)
             if not r.get("f3_ok"):
                 r["f3_ok"] = 1 if r.get("f3_max", "") not in ("", None) else 0
         else:
             n_bk += 1
+            r["live"] = 0
             r.setdefault("f3_ok", 0)
             # backfill: old rain_1h was cumulative diff = station precip x15 -> undo the x15
             r["rain_1h"] = round(_f(r["rain_1h"]) / 15.0, 1)
@@ -104,6 +135,9 @@ def main():
         hist.append((r["_dt"], _f(r["rain_1h"])))
         hist = hist[-12:]
 
+    from backfill import add_f3_rolling
+    add_f3_rolling(rows)
+
     with open(CSV, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
@@ -117,4 +151,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    ensure()

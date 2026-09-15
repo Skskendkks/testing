@@ -87,8 +87,29 @@ def select_training_rows(rows):
 
 
 def is_live_row(row):
-    """Live-polled rows carry TC-track features; backfilled rows leave them blank."""
+    """Live-polled rows are flagged live=1 (v4.2); older files: TC features non-blank."""
+    live = str(row.get("live", "")).strip()
+    if live in ("0", "1"):
+        return live == "1"
     return row.get("tc_dist_km", "") not in ("", None)
+
+
+ALERT_MIN_PRECISION = 0.30   # lead alert fires when P(onset) >= threshold with >=30% precision on the cal fold
+ALERT_MIN_HITS = 3
+
+
+def alert_threshold(p_cal, y_cal):
+    """Lowest probability threshold whose precision on the calibration fold is >= ALERT_MIN_PRECISION.
+    Returns None if no threshold reaches it (alerts stay off for that target)."""
+    pairs = sorted(zip(p_cal, y_cal), reverse=True)
+    best = None
+    tp = n = 0
+    for p, t in pairs:
+        n += 1
+        tp += int(t)
+        if tp >= ALERT_MIN_HITS and tp / n >= ALERT_MIN_PRECISION:
+            best = p
+    return round(float(best), 4) if best is not None else None
 
 
 def _f(row, key, default=0.0):
@@ -235,7 +256,7 @@ def main():
     }
     weights_out = {"meta": dict(meta)}
     trees_out = {"meta": dict(meta)}
-    blend_out = {"meta": dict(meta), "targets": {t: 0.0 for t in TARGETS}}
+    blend_out = {"meta": dict(meta), "targets": {t: 0.0 for t in TARGETS}, "alert_threshold": {}}
     metrics = {"n_total": n, "generated": generated, "rows": row_mode, "targets": {}}
     if rows:
         metrics["train_range"] = [rows[0]["ts"], rows[-1]["ts"]]
@@ -383,6 +404,23 @@ def main():
                          for r, a, t in zip(rules_te, p_cal_te, y_te)) / len(y_te)
         blend_out["targets"][target] = w_blend
         report["blend_w"] = w_blend
+        # lead-alert threshold chosen on the calibration fold (P(onset) after blending)
+        blended_ca = [(1 - w_blend) * r + w_blend * a for r, a in zip(rules_ca, p_cal_ca)]
+        thr = alert_threshold(blended_ca, list(y_ca))
+        blend_out["alert_threshold"][target] = thr
+        report["alert_threshold"] = thr
+        # per-year breakdown on the test fold — is the score stable or carried by one season?
+        by_year = {}
+        for i, (yt, pc, pb) in enumerate(zip(y_te, p_cal_te, p_base)):
+            yr = rows[test_idx[i]]["ts"][:4]
+            b = by_year.setdefault(yr, {"n": 0, "n_pos": 0, "_y": [], "_p": []})
+            b["n"] += 1; b["n_pos"] += int(yt); b["_y"].append(yt); b["_p"].append(pc)
+        for yr, b in by_year.items():
+            if 0 < b["n_pos"] < b["n"]:
+                b["pr_auc"] = round(float(average_precision_score(b.pop("_y"), b.pop("_p"))), 4)
+            else:
+                b.pop("_y"); b.pop("_p")
+        report["by_year"] = by_year
         report["blend_brier_test"] = round(b_blend_te, 4)
         report["rules_only_brier_test"] = round(brier(y_te, np.array(rules_te)), 4)
 

@@ -59,9 +59,10 @@
   <div class="card"><h2>Special wx tips (HKO)</h2><div id="tips"><span class="tip">none</span></div></div>
   <div class="card"><h2>Tropical cyclones (JTWC)</h2><div id="tc"><span class="tip">none near Hong Kong</span></div></div>
   <div class="card"><h2>Last 7 days · hourly rainfall (mm)</h2><svg id="chart" viewBox="0 0 700 120" preserveAspectRatio="none"></svg></div>
+  <div class="card"><h2>Model quality (time-ordered test fold)</h2><div id="quality"><span class="tip">no metrics yet</span></div></div>
 </main>
 <footer>
-  Data: HKO Open Data API (<a href="https://www.hko.gov.hk/en/abouthko/opendata_intro.htm">hko.gov.hk</a>) · Cyclone tracks: NOAA ATCF (JTWC). Testing predictions are experimental and not official forecasts. Do not use for safety-critical decisions — refer to official HKO warnings for work/school/evacuation decisions.
+  Data: HKO Open Data API (<a href="https://www.hko.gov.hk/en/abouthko/opendata_intro.htm">hko.gov.hk</a>) · Cyclone tracks: JTWC warnings (live) + IBTrACS (history). Testing predictions are experimental and not official forecasts. Do not use for safety-critical decisions — refer to official HKO warnings for work/school/evacuation decisions.
   <br><a href="https://github.com/Skskendkks/testing">View source on GitHub</a>
 </footer>
 <script>
@@ -111,8 +112,13 @@ function setFreshness(iso){
   Object.values(latest.official_levels||{}).forEach(l=>warns.push(l));
   wd.innerHTML = warns.length ? warns.map(chip).join("") : `<span class="tip">none active</span>`;
   const pd = document.getElementById("preds");
-  pd.innerHTML = Object.entries(latest.predictions||{}).map(([k,p])=>
-    `<div class="prob"><div class="lbl"><span>${TARGET_LABELS[k]||k}</span><span class="pct">${fmtPct(p)}</span></div>${bar(p)}</div>`).join("");
+  const inForce = new Set(latest.in_force||[]);
+  const thr = latest.alert_threshold||{};
+  pd.innerHTML = Object.entries(latest.predictions||{}).map(([k,p])=>{
+    const pct = inForce.has(k) ? "IN FORCE" : fmtPct(p);
+    const alert = (!inForce.has(k) && thr[k]!=null && p>=thr[k]) ? " · alert" : "";
+    return `<div class="prob"><div class="lbl"><span>${TARGET_LABELS[k]||k}</span><span class="pct">${pct}${alert}</span></div>${bar(p)}</div>`;
+  }).join("");
   const bw = latest.blend_ai_weight;
   const bwText = (bw && typeof bw === "object")
     ? Object.entries(bw).map(([k,w])=>`${k}:${w}`).join(" ")
@@ -134,6 +140,17 @@ function setFreshness(iso){
   } else {
     tcEl.innerHTML = `<span class="tip">no active WP cyclone within 2500 km</span>`;
   }
+  try {
+    const m = await loadJson("data/metrics.json");
+    const q = document.getElementById("quality");
+    const rowsMode = m.rows ? ` · training rows: ${m.rows.mode} (${m.rows.n_f3_rows} with F3)` : "";
+    q.innerHTML = Object.entries(m.targets||{}).map(([k,r])=>{
+      if(!r.ships) return `<div class="stat"><span>${TARGET_LABELS[k]||k}</span><b class="tip">${r.status||"not shipped"}</b></div>`;
+      const base = r.baseline ? ` (baseline ${r.baseline.pr_auc})` : "";
+      const alert = r.alert_threshold!=null ? ` · alert ≥${fmtPct(r.alert_threshold)}` : " · alerts off";
+      return `<div class="stat"><span>${TARGET_LABELS[k]||k} · ${r.model}</span><b>PR-AUC ${r.pr_auc}${base}${alert}</b></div>`;
+    }).join("") + `<div class="tip">test rows ${m.targets?.amber_3h?.n_test??"–"}, generated ${m.generated||"–"}${rowsMode}</div>`;
+  } catch(e) { /* metrics.json appears after the first retrain */ }
   if(history && history.length>1) document.getElementById("chart").innerHTML = chart(history);
   else document.getElementById("chart").outerHTML = `<div class="tip">collecting history…</div>`;
 })().catch(e=>{ document.body.innerHTML = `<main><div class="card"><h2>Data not ready</h2><p class="tip">${e} — wait for the first poll run to complete (up to 20 min), or check Actions ran successfully.</p></div></main>`; });

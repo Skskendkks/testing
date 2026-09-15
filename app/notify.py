@@ -45,11 +45,30 @@ def _within_cooldown(state, key, now):
     return now - last_ts < timedelta(hours=COOLDOWN_HOURS)
 
 
+def alert_thresholds():
+    """Per-target thresholds learned by train.py (model/blend.json); fallback to the fixed 60%."""
+    path = ROOT / "model" / "blend.json"
+    out = {t: AI_ALERT_THRESHOLD for t in AI_ALERT_TARGETS}
+    try:
+        with open(path, encoding="utf-8") as f:
+            learned = json.load(f).get("alert_threshold", {}) or {}
+    except (OSError, ValueError):
+        return out
+    for t in AI_ALERT_TARGETS:
+        if t in learned:
+            out[t] = learned[t] if learned[t] is not None else None  # None = alerts off (no reliable threshold)
+    return out
+
+
 def ai_alert_keys(probs, state, now):
     keys = []
+    thresholds = alert_thresholds()
     for target in AI_ALERT_TARGETS:
+        thr = thresholds.get(target, AI_ALERT_THRESHOLD)
+        if thr is None:
+            continue
         p = probs.get(target, 0.0)
-        if p >= AI_ALERT_THRESHOLD and not _within_cooldown(state, target, now):
+        if p >= thr and not _within_cooldown(state, target, now):
             keys.append(target)
     return keys
 

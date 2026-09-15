@@ -164,6 +164,27 @@ def save_dataset(X, y, B, T):
 F3_MATCH_MINUTES = 20   # hourly snapshot row <-> nearest F3 snapshot tolerance
 
 
+def add_f3_rolling(rows):
+    """f3_max_1h / f3_max_3h = max of f3_max over this row and rows within the past 1h / 3h
+    that carry real F3 data. Rows are assumed sorted by ts."""
+    hist = []  # (ts, f3_max) for f3_ok rows
+    for r in rows:
+        try:
+            ts = datetime.fromisoformat(r["ts"])
+        except (KeyError, ValueError):
+            continue
+        if ts.tzinfo is None:
+            ts = ts.replace(tzinfo=timezone.utc)
+        if str(r.get("f3_ok", "")) != "1":
+            continue
+        cur = float(r.get("f3_max") or 0.0)
+        hist = [(t, v) for t, v in hist if (ts - t) <= timedelta(minutes=185)]
+        m1 = max([cur] + [v for t, v in hist if (ts - t) <= timedelta(minutes=65)])
+        m3 = max([cur] + [v for t, v in hist])
+        r["f3_max_1h"], r["f3_max_3h"] = round(m1, 2), round(m3, 2)
+        hist.append((ts, cur))
+
+
 def write_f3_to_snapshots(all_snap):
     """Attach f3_* scalars to the hourly rows of snapshots.csv nearest each F3 snapshot."""
     if not SNAPSHOT_CSV.exists():
@@ -196,6 +217,7 @@ def write_f3_to_snapshots(all_snap):
         r.update(f3_scalars(all_snap[best[0]][1]))
         r["f3_ok"] = 1
         updated += 1
+    add_f3_rolling(rows)
     with open(SNAPSHOT_CSV, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=CSV_COLUMNS, extrasaction="ignore")
         w.writeheader()

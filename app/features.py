@@ -38,6 +38,10 @@ FEATURE_COLS = [
     "f3_max",
     "f3_mean",
     "f3_trend",
+    "f3_max_1h",    # v4.2: rolling max of f3_max over the previous ~1h / ~3h of rows
+    "f3_max_3h",
+    "month_sin",    # v4.2: smooth seasonality derived from ts (replaces the coarse `season` step)
+    "month_cos",
 ]
 
 FEATURE_DEFAULTS = {
@@ -89,7 +93,22 @@ def load_blend():
     return _load_json(BLEND_JSON)
 
 
+def _month_feats(row):
+    try:
+        m = int(str(row.get("ts", ""))[5:7])
+    except ValueError:
+        return 0.0, 0.0
+    if not 1 <= m <= 12:
+        return 0.0, 0.0
+    ang = 2 * math.pi * (m - 1) / 12.0
+    return math.sin(ang), math.cos(ang)
+
+
 def _feat(row, col):
+    if col == "month_sin":
+        return _month_feats(row)[0]
+    if col == "month_cos":
+        return _month_feats(row)[1]
     v = row.get(col, None)
     if v in (None, ""):
         return FEATURE_DEFAULTS.get(col, 0.0)

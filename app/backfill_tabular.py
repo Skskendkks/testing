@@ -264,6 +264,22 @@ def main():
         return
     n_before, added, n_after = merge_into_csv(all_rows, CSV_COLUMNS)
     print(f"[backfill-tab] merged: {n_before} existing + {added} archived -> {n_after} rows")
+
+    # v4.2: tropical-cyclone features for the same years from IBTrACS (non-live rows only)
+    try:
+        from backfill_tc import fill_tc
+        with open(SNAPSHOT_CSV, newline="", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        for r in rows:
+            r.setdefault("live", 0 if r.get("tc_dist_km", "") in ("", None) else r.get("live", ""))
+        if fill_tc(rows, range(args.start_year, args.end_year + 1)):
+            with open(SNAPSHOT_CSV, "w", newline="", encoding="utf-8") as f:
+                w = csv.DictWriter(f, fieldnames=CSV_COLUMNS, extrasaction="ignore")
+                w.writeheader()
+                for r in rows:
+                    w.writerow(r)
+    except Exception as e:
+        print(f"[backfill-tab] TC backfill skipped: {e}")
     for name, fl in [("AMBER", "w_RAIN_AMBER"), ("RED", "w_RAIN_RED"), ("BLACK", "w_RAIN_BLACK"),
                      ("TC3", "w_TC3"), ("TC8+", "w_TC8")]:
         print(f"  {name}: {sum(1 for r in all_rows if r.get(fl) == 1)} flagged hours")

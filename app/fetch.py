@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from features import TARGETS, TARGET_FLAG, TARGET_LABELS, blend_weights, predict_ai
 import jtwc
-from notify import ai_alert_keys, load_notified, save_notified, send_email
+from notify import ai_alert_keys, alert_thresholds, load_notified, save_notified, send_email
 from rules import rule_probs
 import grid as gridmod
 
@@ -70,6 +70,9 @@ CSV_COLUMNS = [
     "f3_mean",
     "f3_trend",
     "f3_ok",
+    "f3_max_1h",
+    "f3_max_3h",
+    "live",        # 1 = polled in real time (full feature set); 0/blank = backfilled
 ]
 
 WARNSUMS_TO_FLAGS = {
@@ -181,8 +184,9 @@ def build_row(weather, warnsum, messages, levels, prior_rows, tc_feats, f3_feats
     rain_3h = rain_1h + (_f(prev_1h, "rain_1h") if prev_1h else 0.0) + (_f(prev_2h, "rain_1h") if prev_2h else 0.0)
 
     recent_60 = rows_within(prior_rows, 60)
-    hum_1h_delta = (hum_mean - _f(recent_60[0], "hum_mean")) if recent_60 and hum_mean is not None else 0.0
-    temp_1h_delta = (temp_mean - _f(recent_60[0], "temp_mean")) if recent_60 and temp_mean is not None else 0.0
+    ref = prev_1h  # v4.2: deltas against the row ~60 min ago (not "oldest row within 60 min")
+    hum_1h_delta = (hum_mean - _f(ref, "hum_mean")) if ref and hum_mean is not None and ref.get("hum_mean") not in ("", None) else 0.0
+    temp_1h_delta = (temp_mean - _f(ref, "temp_mean")) if ref and temp_mean is not None and ref.get("temp_mean") not in ("", None) else 0.0
 
     hk_now = now + HK_OFFSET
     row = {
@@ -209,6 +213,13 @@ def build_row(weather, warnsum, messages, levels, prior_rows, tc_feats, f3_feats
     row["tc_dist_rate"] = round(tc_feats.get("tc_dist_km", 2000) - prev_dist, 1) if prev_dist else 0.0
     for key, value in (f3_feats or f3_features(None)).items():
         row[key] = value
+    # v4.2: rolling max of f3_max over the previous ~1h / ~3h rows (is the rain building?)
+    prev_3h = row_near(prior_rows, 180)
+    f3_prev = [_f(r, "f3_max") for r in (prev_1h,) if r]
+    row["f3_max_1h"] = round(max([row["f3_max"]] + f3_prev), 2)
+    f3_prev3 = [_f(r, "f3_max") for r in (prev_1h, prev_2h, prev_3h) if r]
+    row["f3_max_3h"] = round(max([row["f3_max"]] + f3_prev3), 2)
+    row["live"] = 1
     return row, temps, hums, rains
 
 
@@ -438,7 +449,12 @@ def main():
         "tc": tc_state.get("nearest"),
         "tc_scanned": tc_state.get("scanned", []),
         "blend_ai_weight": {t: round(w_map.get(t, 0.0), 2) for t in TARGETS},
+        "alert_threshold": alert_thresholds(),
+        "in_force": sorted(active),
     })
+    metrics_path = ROOT / "model" / "metrics.json"
+    if metrics_path.exists():
+        write_json(SITE_DATA_DIR / "metrics.json", json.loads(metrics_path.read_text(encoding="utf-8")))
     write_json(HISTORY_JSON, build_history(rows))
     write_json(SITE_DATA_DIR / "latest.json", json.loads(LATEST_JSON.read_text(encoding="utf-8")))
     write_json(SITE_DATA_DIR / "history.json", json.loads(HISTORY_JSON.read_text(encoding="utf-8")))
