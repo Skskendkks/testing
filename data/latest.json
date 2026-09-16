@@ -1,20 +1,20 @@
 {
-  "ts": "2026-09-16T00:10:33+00:00",
-  "temp_mean": 27.3,
-  "hum_mean": 75.0,
-  "rain_total": 3,
-  "rain_main": 3,
-  "rain_1h": 0.2,
-  "rain_3h": 0.2,
+  "ts": "2026-09-16T05:55:18+00:00",
+  "temp_mean": 30.3,
+  "hum_mean": 61.0,
+  "rain_total": 0,
+  "rain_main": 0,
+  "rain_1h": 0.0,
+  "rain_3h": 0.0,
   "active_warnings": [],
   "special_tips": [],
   "predictions": {
     "rain_1h": 0.1,
-    "amber_3h": 0.05,
-    "red_3h": 0.02,
-    "tc3_6h": 0.24
+    "amber_3h": 0.018,
+    "red_3h": 0.004,
+    "tc3_6h": 0.002
   },
-  "v3_grid_ts": "202609160818",
+  "v3_grid_ts": "202609161406",
   "official_levels": {},
   "tc": null,
   "tc_scanned": [
@@ -22,14 +22,14 @@
   ],
   "blend_ai_weight": {
     "rain_1h": 0.0,
-    "amber_3h": 0.7,
-    "red_3h": 0.0,
-    "tc3_6h": 0.0
+    "amber_3h": 0.9,
+    "red_3h": 0.8,
+    "tc3_6h": 1.0
   },
   "alert_threshold": {
-    "amber_3h": 0.6,
-    "red_3h": 0.6,
-    "tc3_6h": 0.6
+    "amber_3h": 0.0782,
+    "tc3_6h": 0.0018,
+    "red_3h": null
   },
   "in_force": []
 }
