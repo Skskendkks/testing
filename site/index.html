@@ -151,6 +151,7 @@ function setFreshness(iso){
       const rmode = r.rows_mode ? ` · ${r.rows_mode}` : "";
       return `<div class="stat"><span>${TARGET_LABELS[k]||k} · ${r.model}${rmode}</span><b>PR-AUC ${r.pr_auc}${base}${alert}</b></div>`;
     }).join("") + `<div class="tip">test rows ${m.targets?.amber_3h?.n_test??"–"}, generated ${m.generated||"–"}${rowsMode}</div>`;
+  } catch(e) { /* metrics.json appears after the first retrain */ }
   if(history && history.length>1) document.getElementById("chart").innerHTML = chart(history);
   else document.getElementById("chart").outerHTML = `<div class="tip">collecting history…</div>`;
 })().catch(e=>{ document.body.innerHTML = `<main><div class="card"><h2>Data not ready</h2><p class="tip">${e} — wait for the first poll run to complete (up to 20 min), or check Actions ran successfully.</p></div></main>`; });
