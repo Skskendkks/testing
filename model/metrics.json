@@ -1,100 +1,121 @@
 {
-  "n_total": 240981,
-  "generated": "2026-09-15T08:47:40",
+  "n_total": 6966,
+  "generated": "2026-09-16T03:28:20",
+  "rows": {
+    "mode": "f3_only",
+    "n_f3_rows": 6966
+  },
   "targets": {
     "rain_1h": {
-      "n_samples": 239531,
-      "n_pos": 39,
-      "n_val": 47907,
-      "n_val_pos": 39,
+      "n_samples": 6578,
+      "n_pos": 36,
+      "n_train": 3946,
+      "n_train_pos": 0,
+      "n_cal": 1316,
+      "n_cal_pos": 0,
+      "n_test": 1316,
+      "n_test_pos": 36,
+      "test_range": [
+        "2025-03-15T17:00:00+00:00",
+        "2026-08-26T10:46:35+00:00"
+      ],
       "status": "skipped (a fold has a single class \u2014 need more positives)"
     },
     "amber_3h": {
-      "n_samples": 240803,
-      "n_pos": 3156,
-      "n_val": 48161,
-      "n_val_pos": 837,
+      "n_samples": 6720,
+      "n_pos": 141,
+      "n_train": 4032,
+      "n_train_pos": 90,
+      "n_cal": 1344,
+      "n_cal_pos": 21,
+      "n_test": 1344,
+      "n_test_pos": 30,
+      "test_range": [
+        "2025-03-23T12:00:00+00:00",
+        "2026-09-15T21:16:44+00:00"
+      ],
       "lr": {
-        "pr_auc": 0.2524,
-        "brier": 0.0936
+        "cal_pr_auc": 0.0548,
+        "cal_brier": 0.0948,
+        "test_pr_auc": 0.3285
       },
       "trees": {
-        "pr_auc": 0.2457,
-        "brier": 0.0684
-      },
-      "model": "lr",
-      "calibrated": true,
-      "pr_auc": 0.2524,
-      "brier": 0.0148,
-      "persistence": {
-        "pr_auc": 0.2305,
-        "brier": 0.0149
-      },
-      "climatology": {
-        "brier": 0.0171
-      },
-      "ships": true,
-      "blend_w": 0.7,
-      "blend_brier": 0.0144,
-      "status": "shipped"
-    },
-    "red_3h": {
-      "n_samples": 240803,
-      "n_pos": 592,
-      "n_val": 48161,
-      "n_val_pos": 172,
-      "lr": {
-        "pr_auc": 0.1365,
-        "brier": 0.0857
-      },
-      "trees": {
-        "pr_auc": 0.0983,
-        "brier": 0.0202
-      },
-      "model": "lr",
-      "calibrated": true,
-      "pr_auc": 0.1365,
-      "brier": 0.0034,
-      "persistence": {
-        "pr_auc": 0.1658,
-        "brier": 0.0033
-      },
-      "climatology": {
-        "brier": 0.0036
-      },
-      "ships": false,
-      "status": "rules-only (did not beat persistence baseline)"
-    },
-    "tc3_6h": {
-      "n_samples": 240935,
-      "n_pos": 2806,
-      "n_val": 48187,
-      "n_val_pos": 788,
-      "lr": {
-        "pr_auc": 0.053,
-        "brier": 0.2226
-      },
-      "trees": {
-        "pr_auc": 0.0547,
-        "brier": 0.1246
+        "cal_pr_auc": 0.0777,
+        "cal_brier": 0.0245,
+        "test_pr_auc": 0.1557
       },
       "model": "trees",
       "calibrated": true,
-      "pr_auc": 0.0547,
-      "brier": 0.0158,
-      "persistence": {
-        "pr_auc": 0.6863,
-        "brier": 0.0053
+      "pr_auc": 0.1557,
+      "brier": 0.0214,
+      "baseline": {
+        "name": "escalation (w_WTS in force)",
+        "pr_auc": 0.0851,
+        "brier": 0.1756
       },
       "climatology": {
-        "brier": 0.0161
+        "brier": 0.0218
       },
-      "ships": false,
-      "status": "rules-only (did not beat persistence baseline)"
+      "live_only": {
+        "n": 434,
+        "n_pos": 7,
+        "pr_auc": 0.1957,
+        "brier": 0.0152,
+        "baseline_pr_auc": 0.0921,
+        "baseline_brier": 0.159
+      },
+      "ships": true,
+      "blend_w": 0.9,
+      "alert_threshold": 0.0782,
+      "by_year": {
+        "2025": {
+          "n": 910,
+          "n_pos": 23,
+          "pr_auc": 0.193
+        },
+        "2026": {
+          "n": 434,
+          "n_pos": 7,
+          "pr_auc": 0.1957
+        }
+      },
+      "blend_brier_test": 0.0208,
+      "rules_only_brier_test": 0.027,
+      "status": "shipped"
+    },
+    "red_3h": {
+      "n_samples": 6826,
+      "n_pos": 37,
+      "n_train": 4095,
+      "n_train_pos": 20,
+      "n_cal": 1365,
+      "n_cal_pos": 0,
+      "n_test": 1366,
+      "n_test_pos": 17,
+      "test_range": [
+        "2025-03-23T09:00:00+00:00",
+        "2026-09-15T21:16:44+00:00"
+      ],
+      "status": "skipped (a fold has a single class \u2014 need more positives)"
+    },
+    "tc3_6h": {
+      "n_samples": 6890,
+      "n_pos": 24,
+      "n_train": 4134,
+      "n_train_pos": 12,
+      "n_cal": 1378,
+      "n_cal_pos": 0,
+      "n_test": 1378,
+      "n_test_pos": 12,
+      "test_range": [
+        "2025-03-25T19:00:00+00:00",
+        "2026-09-15T18:07:36+00:00"
+      ],
+      "status": "skipped (a fold has a single class \u2014 need more positives)"
     }
   },
   "train_range": [
-    "1998-01-01T00:00:00+00:00",
-    "2026-09-15T07:37:46+00:00"
+    "2023-05-31T16:00:00+00:00",
+    "2026-09-16T00:10:33+00:00"
   ]
 }

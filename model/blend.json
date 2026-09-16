@@ -4,7 +4,6 @@
     "feature_cols": [
       "temp_mean",
       "hum_mean",
-      "rain_total",
       "rain_1h",
       "rain_3h",
       "hum_1h_delta",
@@ -12,6 +11,11 @@
       "hour",
       "season",
       "w_WTS",
+      "w_TCSGNL",
+      "w_TC1",
+      "w_TC3",
+      "w_RAIN_AMBER",
+      "w_RAIN_RED",
       "tc_dist_km",
       "tc_wind_kts",
       "tc_24h_dist_km",
@@ -19,15 +23,22 @@
       "tc_dist_rate",
       "f3_max",
       "f3_mean",
-      "f3_trend"
+      "f3_trend",
+      "f3_max_1h",
+      "f3_max_3h",
+      "month_sin",
+      "month_cos"
     ],
-    "n_total": 240981,
-    "generated": "2026-09-15T08:47:40"
+    "n_total": 6966,
+    "generated": "2026-09-16T03:28:20"
   },
   "targets": {
     "rain_1h": 0.0,
-    "amber_3h": 0.7,
+    "amber_3h": 0.9,
     "red_3h": 0.0,
     "tc3_6h": 0.0
+  },
+  "alert_threshold": {
+    "amber_3h": 0.0782
   }
 }
