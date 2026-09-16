@@ -75,15 +75,24 @@ def has_f3(row):
 
 
 def select_training_rows(rows):
-    """F3-only mode: once enough rows carry real F3 scalars, train/evaluate on those
-    only, so the model is not dominated by 25 years of rows with f3_*=0 and rain=0.
-    Override with F3_ONLY=0 / F3_ONLY=1 in the environment."""
+    """Return the candidate row-sets to try, richest first: F3-only rows (once there
+    are enough of them) ahead of the full history. Per-target selection (v4.3) tries
+    each candidate in order and keeps the first that yields valid train/cal/test
+    folds, so a target with F3-covered positives (e.g. amber_3h) trains on the
+    richer F3 features while a target whose positives are mostly outside the F3
+    backfill window (e.g. tc3_6h, red_3h) still falls back to the full history
+    instead of being skipped outright. Override with F3_ONLY=0 / F3_ONLY=1."""
     n_f3 = sum(1 for r in rows if has_f3(r))
     force = os.environ.get("F3_ONLY")
-    use = (force == "1") if force in ("0", "1") else n_f3 >= MIN_F3_ROWS
-    if use and n_f3 > 0:
-        return [r for r in rows if has_f3(r)], {"mode": "f3_only", "n_f3_rows": n_f3}
-    return rows, {"mode": "all_rows", "n_f3_rows": n_f3}
+    use_f3 = (force == "1") if force in ("0", "1") else n_f3 >= MIN_F3_ROWS
+    candidates = []
+    if use_f3 and n_f3 > 0:
+        candidates.append(("f3_only", [r for r in rows if has_f3(r)]))
+    if force != "1":
+        candidates.append(("all_rows", rows))
+    if not candidates:
+        candidates.append(("all_rows", rows))
+    return candidates, {"n_total_rows": len(rows), "n_f3_rows": n_f3}
 
 
 def is_live_row(row):
@@ -245,8 +254,9 @@ def main():
             print("[train] applied v4.1 snapshot migration")
     except Exception as e:
         print(f"[train] v4.1 migration skipped: {e}")
-    rows, row_mode = select_training_rows(load_rows())
-    n = len(rows)
+    all_rows = load_rows()
+    candidates, row_mode = select_training_rows(all_rows)
+    n = len(all_rows)
     generated = datetime.now().isoformat(timespec="seconds")
     meta = {
         "artifact_version": 2,
@@ -258,8 +268,8 @@ def main():
     trees_out = {"meta": dict(meta)}
     blend_out = {"meta": dict(meta), "targets": {t: 0.0 for t in TARGETS}, "alert_threshold": {}}
     metrics = {"n_total": n, "generated": generated, "rows": row_mode, "targets": {}}
-    if rows:
-        metrics["train_range"] = [rows[0]["ts"], rows[-1]["ts"]]
+    if all_rows:
+        metrics["train_range"] = [all_rows[0]["ts"], all_rows[-1]["ts"]]
 
     MODEL_DIR.mkdir(exist_ok=True)
     if n < MIN_ROWS:
@@ -279,29 +289,47 @@ def main():
         return float(np.mean((p - y) ** 2))
 
     for target in TARGETS:
-        X, y, idx = build_samples(rows, target)
-        report = {"n_samples": len(y), "n_pos": int(sum(y))}
-        metrics["targets"][target] = report
-        if len(y) < MIN_ROWS or sum(y) < MIN_POSITIVES:
-            report["status"] = f"skipped ({sum(y)} positives < {MIN_POSITIVES} or too few rows)"
-            print(f"[train] {target}: {report['status']}")
-            continue
+        # try each row-set candidate (richest/F3-only first), keep the first that
+        # yields valid train/cal/test folds (v4.3 per-target fallback)
+        rows = None
+        report = None
+        for mode_name, cand_rows in candidates:
+            X, y, idx = build_samples(cand_rows, target)
+            cand_report = {"n_samples": len(y), "n_pos": int(sum(y)), "rows_mode": mode_name}
+            if len(y) < MIN_ROWS or sum(y) < MIN_POSITIVES:
+                cand_report["status"] = f"skipped ({sum(y)} positives < {MIN_POSITIVES} or too few rows)"
+                if report is None:
+                    report = cand_report
+                continue
 
-        # time-ordered three-way split: train / calibration / test
-        n_s = len(y)
-        i_tr = max(1, int(n_s * TRAIN_FRAC))
-        i_cal = max(i_tr + 1, int(n_s * (TRAIN_FRAC + CAL_FRAC)))
-        X_tr, X_ca, X_te = np.array(X[:i_tr]), np.array(X[i_tr:i_cal]), np.array(X[i_cal:])
-        y_tr, y_ca, y_te = np.array(y[:i_tr]), np.array(y[i_tr:i_cal]), np.array(y[i_cal:])
-        cal_idx, test_idx = idx[i_tr:i_cal], idx[i_cal:]
-        report["n_train"], report["n_train_pos"] = len(y_tr), int(y_tr.sum())
-        report["n_cal"], report["n_cal_pos"] = len(y_ca), int(y_ca.sum())
-        report["n_test"], report["n_test_pos"] = len(y_te), int(y_te.sum())
-        if test_idx:
-            report["test_range"] = [rows[test_idx[0]]["ts"], rows[test_idx[-1]]["ts"]]
-        if (y_tr.sum() == 0 or y_ca.sum() == 0 or y_te.sum() == 0
-                or y_tr.sum() == len(y_tr) or y_te.sum() == len(y_te)):
-            report["status"] = "skipped (a fold has a single class — need more positives)"
+            # time-ordered three-way split: train / calibration / test
+            n_s = len(y)
+            i_tr = max(1, int(n_s * TRAIN_FRAC))
+            i_cal = max(i_tr + 1, int(n_s * (TRAIN_FRAC + CAL_FRAC)))
+            y_tr_a, y_ca_a, y_te_a = np.array(y[:i_tr]), np.array(y[i_tr:i_cal]), np.array(y[i_cal:])
+            cand_report["n_train"], cand_report["n_train_pos"] = len(y_tr_a), int(y_tr_a.sum())
+            cand_report["n_cal"], cand_report["n_cal_pos"] = len(y_ca_a), int(y_ca_a.sum())
+            cand_report["n_test"], cand_report["n_test_pos"] = len(y_te_a), int(y_te_a.sum())
+            test_idx_probe = idx[i_cal:]
+            if test_idx_probe:
+                cand_report["test_range"] = [cand_rows[test_idx_probe[0]]["ts"], cand_rows[test_idx_probe[-1]]["ts"]]
+            if (y_tr_a.sum() == 0 or y_ca_a.sum() == 0 or y_te_a.sum() == 0
+                    or y_tr_a.sum() == len(y_tr_a) or y_te_a.sum() == len(y_te_a)):
+                cand_report["status"] = "skipped (a fold has a single class — need more positives)"
+                if report is None or report.get("status", "").startswith("skipped (0"):
+                    report = cand_report
+                continue
+
+            # valid candidate — use it
+            rows = cand_rows
+            report = cand_report
+            X_tr, X_ca, X_te = np.array(X[:i_tr]), np.array(X[i_tr:i_cal]), np.array(X[i_cal:])
+            y_tr, y_ca, y_te = y_tr_a, y_ca_a, y_te_a
+            cal_idx, test_idx = idx[i_tr:i_cal], idx[i_cal:]
+            break
+
+        metrics["targets"][target] = report
+        if rows is None:
             print(f"[train] {target}: {report['status']}")
             continue
 
