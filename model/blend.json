@@ -29,16 +29,18 @@
       "month_sin",
       "month_cos"
     ],
-    "n_total": 6966,
-    "generated": "2026-09-16T03:28:20"
+    "n_total": 240986,
+    "generated": "2026-09-16T05:12:49"
   },
   "targets": {
     "rain_1h": 0.0,
     "amber_3h": 0.9,
-    "red_3h": 0.0,
-    "tc3_6h": 0.0
+    "red_3h": 0.8,
+    "tc3_6h": 1.0
   },
   "alert_threshold": {
-    "amber_3h": 0.0782
+    "amber_3h": 0.0782,
+    "red_3h": null,
+    "tc3_6h": 0.0018
   }
 }
