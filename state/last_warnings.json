@@ -1,4 +1,13 @@
 {
-  "warnsum": {},
+  "warnsum": {
+    "WFIRE": {
+      "name": "Fire Danger Warning",
+      "code": "WFIREY",
+      "type": "Yellow",
+      "actionCode": "ISSUE",
+      "issueTime": "2026-09-20T06:00:00+08:00",
+      "updateTime": "2026-09-20T06:00:00+08:00"
+    }
+  },
   "levels": {}
 }
