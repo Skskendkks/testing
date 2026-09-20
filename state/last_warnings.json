@@ -1,12 +1,5 @@
 {
   "warnsum": {
-    "WHOT": {
-      "name": "Very Hot Weather Warning",
-      "code": "WHOT",
-      "actionCode": "ISSUE",
-      "issueTime": "2026-09-20T07:30:00+08:00",
-      "updateTime": "2026-09-20T07:30:00+08:00"
-    },
     "WFIRE": {
       "name": "Fire Danger Warning",
       "code": "WFIREY",
