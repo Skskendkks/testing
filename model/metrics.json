@@ -1,9 +1,9 @@
 {
-  "n_total": 241004,
-  "generated": "2026-09-19T08:09:11",
+  "n_total": 241011,
+  "generated": "2026-09-20T08:41:32",
   "rows": {
-    "n_total_rows": 241004,
-    "n_f3_rows": 6984
+    "n_total_rows": 241011,
+    "n_f3_rows": 6991
   },
   "targets": {
     "rain_1h": {
@@ -23,91 +23,91 @@
       "status": "skipped (a fold has a single class \u2014 need more positives)"
     },
     "amber_3h": {
-      "n_samples": 6724,
+      "n_samples": 6727,
       "n_pos": 141,
       "rows_mode": "f3_only",
-      "n_train": 4034,
+      "n_train": 4036,
       "n_train_pos": 90,
       "n_cal": 1345,
       "n_cal_pos": 21,
-      "n_test": 1345,
+      "n_test": 1346,
       "n_test_pos": 30,
       "test_range": [
-        "2025-03-23T15:00:00+00:00",
-        "2026-09-18T21:36:04+00:00"
+        "2025-03-23T17:00:00+00:00",
+        "2026-09-19T22:54:36+00:00"
       ],
       "lr": {
         "cal_pr_auc": 0.0553,
-        "cal_brier": 0.0943,
-        "test_pr_auc": 0.3283
+        "cal_brier": 0.0944,
+        "test_pr_auc": 0.3277
       },
       "trees": {
-        "cal_pr_auc": 0.0804,
-        "cal_brier": 0.0241,
-        "test_pr_auc": 0.1631
+        "cal_pr_auc": 0.0856,
+        "cal_brier": 0.0228,
+        "test_pr_auc": 0.15
       },
       "model": "trees",
       "calibrated": true,
-      "pr_auc": 0.1631,
-      "brier": 0.0212,
+      "pr_auc": 0.15,
+      "brier": 0.0213,
       "baseline": {
         "name": "escalation (w_WTS in force)",
         "pr_auc": 0.0851,
-        "brier": 0.1755
+        "brier": 0.1753
       },
       "climatology": {
         "brier": 0.0218
       },
       "live_only": {
-        "n": 438,
+        "n": 441,
         "n_pos": 7,
-        "pr_auc": 0.2177,
-        "brier": 0.0148,
+        "pr_auc": 0.1997,
+        "brier": 0.015,
         "baseline_pr_auc": 0.0921,
-        "baseline_brier": 0.1575
+        "baseline_brier": 0.1565
       },
       "ships": true,
       "blend_w": 0.9,
-      "alert_threshold": null,
+      "alert_threshold": 0.0759,
       "by_year": {
         "2025": {
-          "n": 907,
+          "n": 905,
           "n_pos": 23,
-          "pr_auc": 0.1885
+          "pr_auc": 0.2037
         },
         "2026": {
-          "n": 438,
+          "n": 441,
           "n_pos": 7,
-          "pr_auc": 0.2177
+          "pr_auc": 0.1997
         }
       },
-      "blend_brier_test": 0.0206,
+      "blend_brier_test": 0.0207,
       "rules_only_brier_test": 0.0269,
       "status": "shipped"
     },
     "red_3h": {
-      "n_samples": 240476,
+      "n_samples": 240479,
       "n_pos": 383,
       "rows_mode": "all_rows",
-      "n_train": 144285,
+      "n_train": 144287,
       "n_train_pos": 189,
-      "n_cal": 48095,
+      "n_cal": 48096,
       "n_cal_pos": 72,
       "n_test": 48096,
       "n_test_pos": 122,
       "test_range": [
-        "2020-02-12T22:00:00+00:00",
-        "2026-09-18T21:36:04+00:00"
+        "2020-02-13T01:00:00+00:00",
+        "2026-09-19T22:54:36+00:00"
       ],
       "lr": {
-        "cal_pr_auc": 0.0706,
+        "cal_pr_auc": 0.0705,
         "cal_brier": 0.0624,
         "test_pr_auc": 0.0433
       },
       "trees": {
-        "cal_pr_auc": 0.0326,
-        "cal_brier": 0.004,
-        "test_pr_auc": 0.0298
+        "cal_pr_auc": 0.0388,
+        "cal_brier": 0.0041,
+        "test_pr_auc": 0.03
       },
       "model": "lr",
       "calibrated": true,
@@ -122,7 +122,7 @@
         "brier": 0.0025
       },
       "live_only": {
-        "n": 448,
+        "n": 451,
         "n_pos": 0,
         "note": "too few live positives in the test fold to score"
       },
@@ -131,7 +131,7 @@
       "alert_threshold": null,
       "by_year": {
         "2020": {
-          "n": 7706,
+          "n": 7703,
           "n_pos": 31,
           "pr_auc": 0.0619
         },
@@ -161,7 +161,7 @@
           "pr_auc": 0.0851
         },
         "2026": {
-          "n": 456,
+          "n": 459,
           "n_pos": 0
         }
       },
@@ -170,32 +170,32 @@
       "status": "shipped"
     },
     "tc3_6h": {
-      "n_samples": 238894,
+      "n_samples": 238901,
       "n_pos": 891,
       "rows_mode": "all_rows",
-      "n_train": 143336,
+      "n_train": 143340,
       "n_train_pos": 479,
-      "n_cal": 47779,
+      "n_cal": 47780,
       "n_cal_pos": 196,
-      "n_test": 47779,
+      "n_test": 47781,
       "n_test_pos": 216,
       "test_range": [
-        "2020-02-09T03:00:00+00:00",
-        "2026-09-19T00:11:34+00:00"
+        "2020-02-09T08:00:00+00:00",
+        "2026-09-20T00:59:28+00:00"
       ],
       "lr": {
-        "cal_pr_auc": 0.2673,
+        "cal_pr_auc": 0.2667,
         "cal_brier": 0.0158,
-        "test_pr_auc": 0.1778
+        "test_pr_auc": 0.1774
       },
       "trees": {
-        "cal_pr_auc": 0.5704,
+        "cal_pr_auc": 0.5708,
         "cal_brier": 0.0029,
-        "test_pr_auc": 0.3496
+        "test_pr_auc": 0.3497
       },
       "model": "trees",
       "calibrated": true,
-      "pr_auc": 0.3496,
+      "pr_auc": 0.3497,
       "brier": 0.0041,
       "baseline": {
         "name": "escalation (w_TC1 in force)",
@@ -206,7 +206,7 @@
         "brier": 0.0045
       },
       "live_only": {
-        "n": 543,
+        "n": 550,
         "n_pos": 0,
         "note": "too few live positives in the test fold to score"
       },
@@ -215,7 +215,7 @@
       "alert_threshold": 0.0018,
       "by_year": {
         "2020": {
-          "n": 7710,
+          "n": 7705,
           "n_pos": 42,
           "pr_auc": 0.6126
         },
@@ -237,7 +237,7 @@
         "2024": {
           "n": 8297,
           "n_pos": 42,
-          "pr_auc": 0.2457
+          "pr_auc": 0.2458
         },
         "2025": {
           "n": 5566,
@@ -245,17 +245,17 @@
           "pr_auc": 0.4223
         },
         "2026": {
-          "n": 551,
+          "n": 558,
           "n_pos": 0
         }
       },
       "blend_brier_test": 0.0041,
-      "rules_only_brier_test": 0.0934,
+      "rules_only_brier_test": 0.0935,
       "status": "shipped"
     }
   },
   "train_range": [
     "1998-01-01T00:00:00+00:00",
-    "2026-09-19T05:44:21+00:00"
+    "2026-09-20T06:04:57+00:00"
   ]
 }
