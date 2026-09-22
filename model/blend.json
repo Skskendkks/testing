@@ -29,8 +29,8 @@
       "month_sin",
       "month_cos"
     ],
-    "n_total": 241017,
-    "generated": "2026-09-21T09:05:46"
+    "n_total": 241021,
+    "generated": "2026-09-22T08:39:17"
   },
   "targets": {
     "rain_1h": 0.0,
