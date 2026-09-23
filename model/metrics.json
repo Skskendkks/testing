@@ -1,9 +1,9 @@
 {
-  "n_total": 241021,
-  "generated": "2026-09-22T08:39:17",
+  "n_total": 241027,
+  "generated": "2026-09-23T08:42:09",
   "rows": {
-    "n_total_rows": 241021,
-    "n_f3_rows": 7001
+    "n_total_rows": 241027,
+    "n_f3_rows": 7007
   },
   "targets": {
     "rain_1h": {
@@ -23,18 +23,18 @@
       "status": "skipped (a fold has a single class \u2014 need more positives)"
     },
     "amber_3h": {
-      "n_samples": 6730,
+      "n_samples": 6731,
       "n_pos": 141,
       "rows_mode": "f3_only",
       "n_train": 4038,
       "n_train_pos": 90,
       "n_cal": 1346,
       "n_cal_pos": 21,
-      "n_test": 1346,
+      "n_test": 1347,
       "n_test_pos": 30,
       "test_range": [
         "2025-03-23T20:00:00+00:00",
-        "2026-09-20T21:27:50+00:00"
+        "2026-09-22T21:59:31+00:00"
       ],
       "lr": {
         "cal_pr_auc": 0.0552,
@@ -49,22 +49,22 @@
       "model": "trees",
       "calibrated": true,
       "pr_auc": 0.1565,
-      "brier": 0.0212,
+      "brier": 0.0211,
       "baseline": {
         "name": "escalation (w_WTS in force)",
         "pr_auc": 0.0851,
-        "brier": 0.1753
+        "brier": 0.1752
       },
       "climatology": {
         "brier": 0.0218
       },
       "live_only": {
-        "n": 444,
+        "n": 445,
         "n_pos": 7,
         "pr_auc": 0.2228,
         "brier": 0.0146,
         "baseline_pr_auc": 0.0921,
-        "baseline_brier": 0.1554
+        "baseline_brier": 0.1551
       },
       "ships": true,
       "blend_w": 0.9,
@@ -76,7 +76,7 @@
           "pr_auc": 0.1834
         },
         "2026": {
-          "n": 444,
+          "n": 445,
           "n_pos": 7,
           "pr_auc": 0.2228
         }
@@ -86,18 +86,18 @@
       "status": "shipped"
     },
     "red_3h": {
-      "n_samples": 240482,
+      "n_samples": 240483,
       "n_pos": 383,
       "rows_mode": "all_rows",
       "n_train": 144289,
       "n_train_pos": 189,
-      "n_cal": 48096,
+      "n_cal": 48097,
       "n_cal_pos": 72,
       "n_test": 48097,
       "n_test_pos": 122,
       "test_range": [
-        "2020-02-13T03:00:00+00:00",
-        "2026-09-20T21:27:50+00:00"
+        "2020-02-13T04:00:00+00:00",
+        "2026-09-22T21:59:31+00:00"
       ],
       "lr": {
         "cal_pr_auc": 0.0705,
@@ -115,14 +115,14 @@
       "brier": 0.0025,
       "baseline": {
         "name": "escalation (w_RAIN_AMBER in force)",
-        "pr_auc": 0.0345,
+        "pr_auc": 0.0346,
         "brier": 0.0103
       },
       "climatology": {
         "brier": 0.0025
       },
       "live_only": {
-        "n": 454,
+        "n": 455,
         "n_pos": 0,
         "note": "too few live positives in the test fold to score"
       },
@@ -131,9 +131,9 @@
       "alert_threshold": null,
       "by_year": {
         "2020": {
-          "n": 7701,
+          "n": 7700,
           "n_pos": 31,
-          "pr_auc": 0.0619
+          "pr_auc": 0.0621
         },
         "2021": {
           "n": 8626,
@@ -161,7 +161,7 @@
           "pr_auc": 0.0851
         },
         "2026": {
-          "n": 462,
+          "n": 463,
           "n_pos": 0
         }
       },
@@ -170,32 +170,32 @@
       "status": "shipped"
     },
     "tc3_6h": {
-      "n_samples": 238909,
+      "n_samples": 238915,
       "n_pos": 891,
       "rows_mode": "all_rows",
-      "n_train": 143345,
+      "n_train": 143349,
       "n_train_pos": 479,
-      "n_cal": 47782,
+      "n_cal": 47783,
       "n_cal_pos": 196,
-      "n_test": 47782,
+      "n_test": 47783,
       "n_test_pos": 216,
       "test_range": [
-        "2020-02-09T15:00:00+00:00",
-        "2026-09-21T23:12:27+00:00"
+        "2020-02-09T20:00:00+00:00",
+        "2026-09-23T00:21:21+00:00"
       ],
       "lr": {
-        "cal_pr_auc": 0.2674,
+        "cal_pr_auc": 0.2671,
         "cal_brier": 0.0158,
-        "test_pr_auc": 0.1772
+        "test_pr_auc": 0.1776
       },
       "trees": {
-        "cal_pr_auc": 0.5707,
+        "cal_pr_auc": 0.5714,
         "cal_brier": 0.0029,
-        "test_pr_auc": 0.3495
+        "test_pr_auc": 0.3499
       },
       "model": "trees",
       "calibrated": true,
-      "pr_auc": 0.3495,
+      "pr_auc": 0.3499,
       "brier": 0.0041,
       "baseline": {
         "name": "escalation (w_TC1 in force)",
@@ -206,7 +206,7 @@
         "brier": 0.0045
       },
       "live_only": {
-        "n": 558,
+        "n": 564,
         "n_pos": 0,
         "note": "too few live positives in the test fold to score"
       },
@@ -215,7 +215,7 @@
       "alert_threshold": 0.0018,
       "by_year": {
         "2020": {
-          "n": 7698,
+          "n": 7693,
           "n_pos": 42,
           "pr_auc": 0.6126
         },
@@ -237,7 +237,7 @@
         "2024": {
           "n": 8297,
           "n_pos": 42,
-          "pr_auc": 0.245
+          "pr_auc": 0.2449
         },
         "2025": {
           "n": 5566,
@@ -245,7 +245,7 @@
           "pr_auc": 0.4223
         },
         "2026": {
-          "n": 566,
+          "n": 572,
           "n_pos": 0
         }
       },
@@ -256,6 +256,6 @@
   },
   "train_range": [
     "1998-01-01T00:00:00+00:00",
-    "2026-09-22T04:42:46+00:00"
+    "2026-09-23T05:51:31+00:00"
   ]
 }
