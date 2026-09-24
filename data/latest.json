@@ -1,12 +1,14 @@
 {
-  "ts": "2026-09-24T19:02:04+00:00",
-  "temp_mean": 27.0,
-  "hum_mean": 76.0,
+  "ts": "2026-09-24T22:15:27+00:00",
+  "temp_mean": 26.0,
+  "hum_mean": 79.0,
   "rain_total": 0,
   "rain_main": 0,
   "rain_1h": 0.0,
   "rain_3h": 0.0,
-  "active_warnings": [],
+  "active_warnings": [
+    "Fire Danger Warning (ISSUE)"
+  ],
   "special_tips": [],
   "predictions": {
     "rain_1h": 0.1,
@@ -14,18 +16,18 @@
     "red_3h": 0.004,
     "tc3_6h": 0.002
   },
-  "v3_grid_ts": "202609250318",
+  "v3_grid_ts": "202609250630",
   "official_levels": {},
   "tc": {
     "id": "WP25",
-    "ts": "2026-09-24T12:00",
-    "lat": 18.6,
-    "lon": 132.5,
-    "wind_kts": 40,
+    "ts": "2026-09-24T18:00",
+    "lat": 19.3,
+    "lon": 131.7,
+    "wind_kts": 35,
     "pressure_mb": null,
-    "distance_km": 1952,
-    "bearing_deg": 99,
-    "forecast_24h_km": 1519,
+    "distance_km": 1851,
+    "bearing_deg": 97,
+    "forecast_24h_km": 1452,
     "moving_toward_hk": true
   },
   "tc_scanned": [
