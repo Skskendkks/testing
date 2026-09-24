@@ -1,33 +1,31 @@
 {
-  "ts": "2026-09-24T04:35:47+00:00",
-  "temp_mean": 30.5,
+  "ts": "2026-09-24T09:54:11+00:00",
+  "temp_mean": 29.6,
   "hum_mean": 69.0,
-  "rain_total": 2,
-  "rain_main": 1,
-  "rain_1h": 0.1,
-  "rain_3h": 0.1,
+  "rain_total": 0,
+  "rain_main": 0,
+  "rain_1h": 0.0,
+  "rain_3h": 0.0,
   "active_warnings": [],
-  "special_tips": [
-    "Hot weather might cause adverse health effects. The public should stay on the alert and drink more water."
-  ],
+  "special_tips": [],
   "predictions": {
     "rain_1h": 0.1,
     "amber_3h": 0.018,
     "red_3h": 0.004,
     "tc3_6h": 0.002
   },
-  "v3_grid_ts": "202609241254",
+  "v3_grid_ts": "202609241806",
   "official_levels": {},
   "tc": {
     "id": "WP25",
-    "ts": "2026-09-24T00:00",
-    "lat": 18.2,
-    "lon": 134.3,
-    "wind_kts": 35,
+    "ts": "2026-09-24T06:00",
+    "lat": 18.9,
+    "lon": 133.1,
+    "wind_kts": 45,
     "pressure_mb": null,
-    "distance_km": 2147,
-    "bearing_deg": 99,
-    "forecast_24h_km": 1652,
+    "distance_km": 2004,
+    "bearing_deg": 97,
+    "forecast_24h_km": 1535,
     "moving_toward_hk": true
   },
   "tc_scanned": [
@@ -40,7 +38,7 @@
     "tc3_6h": 1.0
   },
   "alert_threshold": {
-    "tc3_6h": 0.0018,
+    "tc3_6h": 0.002,
     "red_3h": null,
     "amber_3h": null
   },
