@@ -1,12 +1,13 @@
 {
-  "ts": "2026-09-25T22:13:31+00:00",
-  "temp_mean": 24.8,
-  "hum_mean": 82.0,
+  "ts": "2026-09-26T01:27:26+00:00",
+  "temp_mean": 28.4,
+  "hum_mean": 75.0,
   "rain_total": 0,
   "rain_main": 0,
   "rain_1h": 0.0,
   "rain_3h": 0.0,
   "active_warnings": [
+    "Very Hot Weather Warning (ISSUE)",
     "Fire Danger Warning (ISSUE)"
   ],
   "special_tips": [],
@@ -16,7 +17,7 @@
     "red_3h": 0.004,
     "tc3_6h": 0.002
   },
-  "v3_grid_ts": "202609260630",
+  "v3_grid_ts": "202609260942",
   "official_levels": {},
   "tc": {
     "id": "WP25",
@@ -40,9 +41,9 @@
     "tc3_6h": 1.0
   },
   "alert_threshold": {
+    "amber_3h": null,
     "red_3h": null,
-    "tc3_6h": 0.0019,
-    "amber_3h": null
+    "tc3_6h": 0.0019
   },
   "in_force": []
 }
