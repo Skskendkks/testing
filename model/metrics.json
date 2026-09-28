@@ -1,9 +1,9 @@
 {
-  "n_total": 241049,
-  "generated": "2026-09-27T09:22:31",
+  "n_total": 241054,
+  "generated": "2026-09-28T09:57:04",
   "rows": {
-    "n_total_rows": 241049,
-    "n_f3_rows": 7029
+    "n_total_rows": 241054,
+    "n_f3_rows": 7034
   },
   "targets": {
     "rain_1h": {
@@ -23,32 +23,32 @@
       "status": "skipped (a fold has a single class \u2014 need more positives)"
     },
     "amber_3h": {
-      "n_samples": 6734,
+      "n_samples": 6735,
       "n_pos": 141,
       "rows_mode": "f3_only",
-      "n_train": 4040,
+      "n_train": 4041,
       "n_train_pos": 90,
       "n_cal": 1347,
       "n_cal_pos": 21,
       "n_test": 1347,
       "n_test_pos": 30,
       "test_range": [
-        "2025-03-23T23:00:00+00:00",
-        "2026-09-26T22:40:48+00:00"
+        "2025-03-24T00:00:00+00:00",
+        "2026-09-27T22:02:39+00:00"
       ],
       "lr": {
-        "cal_pr_auc": 0.0554,
+        "cal_pr_auc": 0.0553,
         "cal_brier": 0.0944,
-        "test_pr_auc": 0.3276
+        "test_pr_auc": 0.3268
       },
       "trees": {
-        "cal_pr_auc": 0.0754,
-        "cal_brier": 0.0233,
-        "test_pr_auc": 0.1499
+        "cal_pr_auc": 0.0765,
+        "cal_brier": 0.0229,
+        "test_pr_auc": 0.1549
       },
       "model": "trees",
       "calibrated": true,
-      "pr_auc": 0.1499,
+      "pr_auc": 0.1549,
       "brier": 0.0213,
       "baseline": {
         "name": "escalation (w_WTS in force)",
@@ -59,26 +59,26 @@
         "brier": 0.0218
       },
       "live_only": {
-        "n": 448,
+        "n": 449,
         "n_pos": 7,
-        "pr_auc": 0.1934,
-        "brier": 0.0148,
+        "pr_auc": 0.2089,
+        "brier": 0.0147,
         "baseline_pr_auc": 0.0921,
-        "baseline_brier": 0.154
+        "baseline_brier": 0.1537
       },
       "ships": true,
       "blend_w": 0.9,
-      "alert_threshold": 0.0777,
+      "alert_threshold": 0.0741,
       "by_year": {
         "2025": {
-          "n": 899,
+          "n": 898,
           "n_pos": 23,
-          "pr_auc": 0.1857
+          "pr_auc": 0.184
         },
         "2026": {
-          "n": 448,
+          "n": 449,
           "n_pos": 7,
-          "pr_auc": 0.1934
+          "pr_auc": 0.2089
         }
       },
       "blend_brier_test": 0.0207,
@@ -86,18 +86,18 @@
       "status": "shipped"
     },
     "red_3h": {
-      "n_samples": 240486,
+      "n_samples": 240487,
       "n_pos": 383,
       "rows_mode": "all_rows",
-      "n_train": 144291,
+      "n_train": 144292,
       "n_train_pos": 189,
       "n_cal": 48097,
       "n_cal_pos": 72,
       "n_test": 48098,
       "n_test_pos": 122,
       "test_range": [
-        "2020-02-13T06:00:00+00:00",
-        "2026-09-26T22:40:48+00:00"
+        "2020-02-13T07:00:00+00:00",
+        "2026-09-27T22:02:39+00:00"
       ],
       "lr": {
         "cal_pr_auc": 0.0705,
@@ -105,9 +105,9 @@
         "test_pr_auc": 0.0433
       },
       "trees": {
-        "cal_pr_auc": 0.0328,
-        "cal_brier": 0.004,
-        "test_pr_auc": 0.0297
+        "cal_pr_auc": 0.0415,
+        "cal_brier": 0.0042,
+        "test_pr_auc": 0.0256
       },
       "model": "lr",
       "calibrated": true,
@@ -122,7 +122,7 @@
         "brier": 0.0025
       },
       "live_only": {
-        "n": 458,
+        "n": 459,
         "n_pos": 0,
         "note": "too few live positives in the test fold to score"
       },
@@ -131,7 +131,7 @@
       "alert_threshold": null,
       "by_year": {
         "2020": {
-          "n": 7698,
+          "n": 7697,
           "n_pos": 31,
           "pr_auc": 0.0621
         },
@@ -161,7 +161,7 @@
           "pr_auc": 0.0851
         },
         "2026": {
-          "n": 466,
+          "n": 467,
           "n_pos": 0
         }
       },
@@ -170,33 +170,33 @@
       "status": "shipped"
     },
     "tc3_6h": {
-      "n_samples": 238934,
+      "n_samples": 238938,
       "n_pos": 891,
       "rows_mode": "all_rows",
-      "n_train": 143360,
+      "n_train": 143362,
       "n_train_pos": 479,
-      "n_cal": 47787,
+      "n_cal": 47788,
       "n_cal_pos": 196,
-      "n_test": 47787,
+      "n_test": 47788,
       "n_test_pos": 216,
       "test_range": [
-        "2020-02-10T11:00:00+00:00",
-        "2026-09-26T22:40:48+00:00"
+        "2020-02-10T14:00:00+00:00",
+        "2026-09-27T22:02:39+00:00"
       ],
       "lr": {
-        "cal_pr_auc": 0.2672,
+        "cal_pr_auc": 0.2675,
         "cal_brier": 0.0158,
-        "test_pr_auc": 0.1776
+        "test_pr_auc": 0.1778
       },
       "trees": {
-        "cal_pr_auc": 0.5821,
+        "cal_pr_auc": 0.5656,
         "cal_brier": 0.0031,
-        "test_pr_auc": 0.3728
+        "test_pr_auc": 0.3614
       },
       "model": "trees",
       "calibrated": true,
-      "pr_auc": 0.3728,
-      "brier": 0.004,
+      "pr_auc": 0.3614,
+      "brier": 0.0039,
       "baseline": {
         "name": "escalation (w_TC1 in force)",
         "pr_auc": 0.0723,
@@ -206,56 +206,56 @@
         "brier": 0.0045
       },
       "live_only": {
-        "n": 583,
+        "n": 587,
         "n_pos": 0,
         "note": "too few live positives in the test fold to score"
       },
       "ships": true,
       "blend_w": 1.0,
-      "alert_threshold": 0.0017,
+      "alert_threshold": 0.0018,
       "by_year": {
         "2020": {
-          "n": 7678,
+          "n": 7675,
           "n_pos": 42,
-          "pr_auc": 0.6149
+          "pr_auc": 0.6276
         },
         "2021": {
           "n": 8542,
           "n_pos": 36,
-          "pr_auc": 0.3149
+          "pr_auc": 0.2884
         },
         "2022": {
           "n": 8545,
           "n_pos": 42,
-          "pr_auc": 0.3839
+          "pr_auc": 0.3862
         },
         "2023": {
           "n": 8568,
           "n_pos": 36,
-          "pr_auc": 0.5283
+          "pr_auc": 0.496
         },
         "2024": {
           "n": 8297,
           "n_pos": 42,
-          "pr_auc": 0.275
+          "pr_auc": 0.2464
         },
         "2025": {
           "n": 5566,
           "n_pos": 18,
-          "pr_auc": 0.4295
+          "pr_auc": 0.3388
         },
         "2026": {
-          "n": 591,
+          "n": 595,
           "n_pos": 0
         }
       },
-      "blend_brier_test": 0.004,
+      "blend_brier_test": 0.0039,
       "rules_only_brier_test": 0.0935,
       "status": "shipped"
     }
   },
   "train_range": [
     "1998-01-01T00:00:00+00:00",
-    "2026-09-27T08:01:17+00:00"
+    "2026-09-28T06:41:42+00:00"
   ]
 }
