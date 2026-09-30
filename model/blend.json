@@ -29,8 +29,8 @@
       "month_sin",
       "month_cos"
     ],
-    "n_total": 241058,
-    "generated": "2026-09-29T09:57:39"
+    "n_total": 241062,
+    "generated": "2026-09-30T09:49:43"
   },
   "targets": {
     "rain_1h": 0.0,
@@ -41,6 +41,6 @@
   "alert_threshold": {
     "amber_3h": 0.0741,
     "red_3h": null,
-    "tc3_6h": 0.002
+    "tc3_6h": 0.0019
   }
 }
