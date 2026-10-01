@@ -1,9 +1,9 @@
 {
-  "n_total": 241062,
-  "generated": "2026-09-30T09:49:43",
+  "n_total": 241066,
+  "generated": "2026-10-01T10:16:52",
   "rows": {
-    "n_total_rows": 241062,
-    "n_f3_rows": 7042
+    "n_total_rows": 241066,
+    "n_f3_rows": 7046
   },
   "targets": {
     "rain_1h": {
@@ -170,32 +170,32 @@
       "status": "shipped"
     },
     "tc3_6h": {
-      "n_samples": 238941,
+      "n_samples": 238944,
       "n_pos": 891,
       "rows_mode": "all_rows",
-      "n_train": 143364,
+      "n_train": 143366,
       "n_train_pos": 479,
-      "n_cal": 47788,
+      "n_cal": 47789,
       "n_cal_pos": 196,
       "n_test": 47789,
       "n_test_pos": 216,
       "test_range": [
-        "2020-02-10T16:00:00+00:00",
-        "2026-09-29T20:40:59+00:00"
+        "2020-02-10T19:00:00+00:00",
+        "2026-09-30T23:41:04+00:00"
       ],
       "lr": {
-        "cal_pr_auc": 0.2671,
+        "cal_pr_auc": 0.2675,
         "cal_brier": 0.0158,
-        "test_pr_auc": 0.1781
+        "test_pr_auc": 0.1779
       },
       "trees": {
-        "cal_pr_auc": 0.5665,
-        "cal_brier": 0.0032,
-        "test_pr_auc": 0.3616
+        "cal_pr_auc": 0.5481,
+        "cal_brier": 0.0033,
+        "test_pr_auc": 0.379
       },
       "model": "trees",
       "calibrated": true,
-      "pr_auc": 0.3616,
+      "pr_auc": 0.379,
       "brier": 0.0039,
       "baseline": {
         "name": "escalation (w_TC1 in force)",
@@ -206,46 +206,46 @@
         "brier": 0.0045
       },
       "live_only": {
-        "n": 590,
+        "n": 593,
         "n_pos": 0,
         "note": "too few live positives in the test fold to score"
       },
       "ships": true,
       "blend_w": 1.0,
-      "alert_threshold": 0.0019,
+      "alert_threshold": 0.002,
       "by_year": {
         "2020": {
-          "n": 7673,
+          "n": 7670,
           "n_pos": 42,
-          "pr_auc": 0.6276
+          "pr_auc": 0.6407
         },
         "2021": {
           "n": 8542,
           "n_pos": 36,
-          "pr_auc": 0.2884
+          "pr_auc": 0.2233
         },
         "2022": {
           "n": 8545,
           "n_pos": 42,
-          "pr_auc": 0.3862
+          "pr_auc": 0.4109
         },
         "2023": {
           "n": 8568,
           "n_pos": 36,
-          "pr_auc": 0.496
+          "pr_auc": 0.5086
         },
         "2024": {
           "n": 8297,
           "n_pos": 42,
-          "pr_auc": 0.2485
+          "pr_auc": 0.2718
         },
         "2025": {
           "n": 5566,
           "n_pos": 18,
-          "pr_auc": 0.3388
+          "pr_auc": 0.4486
         },
         "2026": {
-          "n": 598,
+          "n": 601,
           "n_pos": 0
         }
       },
@@ -256,6 +256,6 @@
   },
   "train_range": [
     "1998-01-01T00:00:00+00:00",
-    "2026-09-30T06:36:40+00:00"
+    "2026-10-01T05:40:00+00:00"
   ]
 }

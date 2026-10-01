@@ -1,15 +1,12 @@
 {
-  "ts": "2026-10-01T05:40:00+00:00",
-  "temp_mean": 33.2,
-  "hum_mean": 63.0,
-  "rain_total": 2,
-  "rain_main": 2,
-  "rain_1h": 0.1,
-  "rain_3h": 0.1,
-  "active_warnings": [
-    "Very Hot Weather Warning (REISSUE)",
-    "Fire Danger Warning (ISSUE)"
-  ],
+  "ts": "2026-10-01T13:01:55+00:00",
+  "temp_mean": 29.3,
+  "hum_mean": 77.0,
+  "rain_total": 0,
+  "rain_main": 0,
+  "rain_1h": 0.0,
+  "rain_3h": 0.0,
+  "active_warnings": [],
   "special_tips": [],
   "predictions": {
     "rain_1h": 0.1,
@@ -17,11 +14,10 @@
     "red_3h": 0.004,
     "tc3_6h": 0.002
   },
-  "v3_grid_ts": "202610011354",
+  "v3_grid_ts": "202610012118",
   "official_levels": {},
   "tc": null,
   "tc_scanned": [
-    "WP25",
     "WP26"
   ],
   "blend_ai_weight": {
@@ -32,7 +28,7 @@
   },
   "alert_threshold": {
     "amber_3h": 0.0741,
-    "tc3_6h": 0.0019,
+    "tc3_6h": 0.002,
     "red_3h": null
   },
   "in_force": []
