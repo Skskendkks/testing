@@ -1,26 +1,22 @@
 {
-  "ts": "2026-10-02T09:38:28+00:00",
-  "temp_mean": 29.1,
-  "hum_mean": 80.0,
-  "rain_total": 111,
-  "rain_main": 66,
-  "rain_1h": 6.2,
-  "rain_3h": 6.2,
+  "ts": "2026-10-02T16:13:40+00:00",
+  "temp_mean": 27.1,
+  "hum_mean": 90.0,
+  "rain_total": 10,
+  "rain_main": 6,
+  "rain_1h": 0.6,
+  "rain_3h": 0.6,
   "active_warnings": [
-    "Special Announcement on Flooding in Northern New Territories (ISSUE)",
     "Thunderstorm Warning (EXTEND)"
   ],
-  "special_tips": [
-    "Localised Heavy Rain Advisory: Rain is particularly heavy in North District of the New Territories. It may cause serious flooding. Residents who are likely to be affected are advised to take necessary precautions to avoid possible flood damage. Heavy rain of more than 70 millimetres of hourly rainfall has fallen or is expected to fall in the above regions.",
-    "Showers and thunderstorms associated with upper-air disturbances are affecting Hong Kong. Showers are expected to be heavy at times over the territory in the next couple of hours. Members of the public should be on the alert."
-  ],
+  "special_tips": [],
   "predictions": {
-    "rain_1h": 0.75,
+    "rain_1h": 0.5,
     "amber_3h": 0.038,
     "red_3h": 0.008,
     "tc3_6h": 0.002
   },
-  "v3_grid_ts": "202610021754",
+  "v3_grid_ts": "202610030030",
   "official_levels": {},
   "tc": null,
   "tc_scanned": [
@@ -33,9 +29,9 @@
     "tc3_6h": 1.0
   },
   "alert_threshold": {
-    "amber_3h": 0.0741,
     "tc3_6h": 0.002,
-    "red_3h": null
+    "red_3h": null,
+    "amber_3h": 0.0741
   },
   "in_force": []
 }
