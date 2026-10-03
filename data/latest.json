@@ -1,26 +1,23 @@
 {
-  "ts": "2026-10-02T21:16:55+00:00",
-  "temp_mean": 24.9,
-  "hum_mean": 94.0,
-  "rain_total": 474,
-  "rain_main": 82,
-  "rain_1h": 26.3,
-  "rain_3h": 26.3,
+  "ts": "2026-10-03T01:05:06+00:00",
+  "temp_mean": 25.1,
+  "hum_mean": 88.0,
+  "rain_total": 109,
+  "rain_main": 38,
+  "rain_1h": 6.1,
+  "rain_3h": 6.1,
   "active_warnings": [
     "Rainstorm Warning Signal (ISSUE)",
     "Thunderstorm Warning (EXTEND)"
   ],
-  "special_tips": [
-    "Localised Heavy Rain Advisory: Rain is particularly heavy in Sai Kung District and Lantau Island in Islands District. It may cause serious flooding. Residents who are likely to be affected are advised to take necessary precautions to avoid possible flood damage. Heavy rain of more than 70 millimetres of hourly rainfall has fallen or is expected to fall in the above regions.",
-    "Areas of intense thundery showers associated with upper air disturbances are affecting Hong Kong. Whether the Red Rainstorm Warning Signal needs to be issued depends on the development of the areas of thundery showers. Members of the public should stay on high alert and take note of the latest weather information."
-  ],
+  "special_tips": [],
   "predictions": {
-    "rain_1h": 0.95,
+    "rain_1h": 0.75,
     "amber_3h": 1.0,
-    "red_3h": 0.112,
+    "red_3h": 0.072,
     "tc3_6h": 0.002
   },
-  "v3_grid_ts": "202610030530",
+  "v3_grid_ts": "202610030918",
   "official_levels": {
     "w_RAIN_AMBER": "Amber Rainstorm"
   },
@@ -35,9 +32,9 @@
     "tc3_6h": 1.0
   },
   "alert_threshold": {
+    "red_3h": null,
     "tc3_6h": 0.002,
-    "amber_3h": 0.0741,
-    "red_3h": null
+    "amber_3h": 0.0741
   },
   "in_force": [
     "amber_3h"
